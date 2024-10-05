@@ -1,10 +1,8 @@
 function GameBlock() {
-	const WIDTH = 100;
-	const HEIGHT = 100;
-
 	return (
 		<div
-			className={`border border-customBorderGray w-[${WIDTH}px] h-[${HEIGHT}px]`}
+			className={`border border-customBorderGray w-[35px] h-[35px]`}
+		// className={`border border-customBorderGray w-[100px] h-[300px]`}
 		></div>
 	);
 }

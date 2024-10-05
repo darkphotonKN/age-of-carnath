@@ -17,6 +17,9 @@ module.exports = {
         customBlockShadowHover:
           "0px 10px 15px -3px rgba(23, 23, 23, 0.15), 6px 8px 10px -2px rgba(23, 23, 23, 0.10)",
       },
+      gridTemplateColumns: {
+        "20": "repeat(20, minmax(0, 1fr))",
+      },
     },
   },
   plugins: [],

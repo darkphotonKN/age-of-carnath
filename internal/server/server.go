@@ -20,7 +20,7 @@ type Server struct {
 func NewServer(listenAddr string) *Server {
 	return &Server{
 		listenAddr: listenAddr,
-		players:    make(map[string]Player, player_limit),
+		// TODO: update this to persist from DB
+		players: make(map[string]Player, player_limit),
 	}
-
 }

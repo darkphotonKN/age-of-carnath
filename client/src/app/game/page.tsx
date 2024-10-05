@@ -1,5 +1,9 @@
 import GameGrid from "@/components/Game/grid";
 
 export default function Game() {
-  return <GameGrid />;
+  return (
+    <div className="h-full">
+      <GameGrid />
+    </div>
+  );
 }

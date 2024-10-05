@@ -22,14 +22,11 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={
-          fontFamily.className +
-          " bg-customGray p-[50px] flex justify-center min-h-screen"
+          fontFamily.className + " bg-customGray p-[50px] min-h-screen"
         }
       >
-        <div className="flex flex-col">
-          <h1 className="text-3xl font-medium">Age of Carnath</h1>
-          {children}
-        </div>
+        <h1 className="text-3xl font-medium text-center">Age of Carnath</h1>
+        {children}
       </body>
     </html>
   );
