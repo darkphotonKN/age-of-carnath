@@ -1,5 +1,7 @@
 package server
 
+import "github.com/gorilla/websocket"
+
 type Player struct {
 	id   string
 	name string
@@ -13,8 +15,9 @@ const (
 * Primarily on the websocket server instance and its performance.
 **/
 type Server struct {
-	listenAddr string
-	players    map[string]Player
+	listenAddr  string
+	players     map[string]Player          // all players that can play
+	clientConns map[*websocket.Conn]Player // all currently connected players from all match connections
 }
 
 func NewServer(listenAddr string) *Server {
