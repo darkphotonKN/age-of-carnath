@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Cormorant_Garamond } from "next/font/google";
+import { EB_Garamond, Cinzel } from "next/font/google";
 
-const fontFamily = Cormorant_Garamond({
+const fontFamily = Cinzel({
   weight: ["400", "500", "700"],
   style: "normal",
   subsets: ["latin"],
@@ -20,8 +20,16 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={fontFamily.className + " bg-customGray"}>
-        <div className="py-[100px] flex justify-center">{children}</div>
+      <body
+        className={
+          fontFamily.className +
+          " bg-customGray p-[50px] flex justify-center min-h-screen"
+        }
+      >
+        <div className="flex flex-col">
+          <h1 className="text-3xl font-medium">Age of Carnath</h1>
+          {children}
+        </div>
       </body>
     </html>
   );
