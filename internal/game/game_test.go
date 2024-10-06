@@ -1,7 +1,6 @@
 package game
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/darkphotonKN/age-of-carnath/internal/server"
@@ -36,20 +35,5 @@ func TestNewGame_GridState(t *testing.T) {
 		},
 	}
 
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println("game.GridState", game.GridState)
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
-	fmt.Println("expectedGridState", expectedGridState)
-	fmt.Println()
-	fmt.Println()
-	fmt.Println()
 	assert.Equal(t, expectedGridState, game.GridState)
 }
