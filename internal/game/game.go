@@ -55,6 +55,9 @@ func NewGame(server *server.Server, gridRows uint8, gridCols uint8) *Game {
 	}
 }
 
+/**
+* Initalizes base game grid
+**/
 func initializeGrid(rows uint8, cols uint8) GridState {
 	newGridState := make([][]GridBlock, rows)
 
@@ -74,6 +77,5 @@ func initializeGrid(rows uint8, cols uint8) GridState {
 			}
 		}
 	}
-
 	return newGridState
 }

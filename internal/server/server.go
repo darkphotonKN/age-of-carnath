@@ -1,6 +1,10 @@
 package server
 
-import "github.com/gorilla/websocket"
+import (
+	"net/http"
+
+	"github.com/gorilla/websocket"
+)
 
 type Player struct {
 	id   string
@@ -12,17 +16,25 @@ const (
 )
 
 /**
-* Primarily on the websocket server instance and its performance.
+* Primary struct on the websocket server instance and its performance.
 **/
 type Server struct {
-	listenAddr  string
+	ListenAddr  string
+	upgrader    websocket.Upgrader
 	players     map[string]Player          // all players that can play
 	clientConns map[*websocket.Conn]Player // all currently connected players from all match connections
 }
 
 func NewServer(listenAddr string) *Server {
+	upgrader := websocket.Upgrader{
+		CheckOrigin: func(r *http.Request) bool {
+			// Allow all connections by default for simplicity; you can add more logic here
+			return true
+		},
+	}
 	return &Server{
-		listenAddr: listenAddr,
+		ListenAddr: listenAddr,
+		upgrader:   upgrader,
 		// TODO: update this to persist from DB
 		players: make(map[string]Player, player_limit),
 	}
