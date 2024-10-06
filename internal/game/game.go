@@ -3,6 +3,15 @@ package game
 import "github.com/darkphotonKN/age-of-carnath/internal/server"
 
 /**
+* Holds all grid and game information.
+* Uses DI for server access (via pointer).
+**/
+type Game struct {
+	server    *server.Server
+	GridState GridState
+}
+
+/**
 * Position on the Grid
 **/
 type Position struct {
@@ -10,6 +19,9 @@ type Position struct {
 	y uint8
 }
 
+/**
+* Enum of Content Types
+**/
 type ContentType string
 
 const (
@@ -40,11 +52,6 @@ type GridBlock struct {
 * Represents the entire game grid, compopsed of GridBlocks.
 **/
 type GridState [][]GridBlock
-
-type Game struct {
-	server    *server.Server
-	GridState GridState
-}
 
 func NewGame(server *server.Server, gridRows uint8, gridCols uint8) *Game {
 	newGrid := initializeGrid(gridRows, gridCols)

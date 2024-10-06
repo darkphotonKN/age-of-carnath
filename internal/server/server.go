@@ -15,6 +15,11 @@ const (
 	player_limit = 5000
 )
 
+type GameMove struct {
+	Action  string `json:"action"`
+	Payload string `json:"payload"`
+}
+
 /**
 * Primary struct on the websocket server instance and its performance.
 **/
@@ -23,6 +28,7 @@ type Server struct {
 	upgrader    websocket.Upgrader
 	players     map[string]Player          // all players that can play
 	clientConns map[*websocket.Conn]Player // all currently connected players from all match connections
+	serverChan  chan GameMove
 }
 
 func NewServer(listenAddr string) *Server {

@@ -12,6 +12,8 @@ func main() {
 	port := ":4111"
 	server := server.NewServer(port)
 
+	go server.MessageHub()
+
 	// routes setup
 	routes := routes.SetupRoutes(server)
 

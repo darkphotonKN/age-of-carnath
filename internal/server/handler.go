@@ -23,7 +23,22 @@ func (s *Server) HandleWebSocket(c *gin.Context) {
 	}
 	defer conn.Close()
 
-	// TODO: handle each client concurrently
+	s.serverChan <- GameMove{
+		Action:  "join_match",
+		Payload: "123",
+	}
+
+	// set conenction and player
+	s.clientConns[conn] = Player{id: "1", name: "guest"}
+
+	// handle each connected client's messages concurrently
+	go s.ServeWsClient(conn)
+}
+
+/**
+* Serves each individual connected client
+**/
+func (s *Server) ServeWsClient(conn *websocket.Conn) {
 	for {
 		_, message, err := conn.ReadMessage()
 		if err != nil {
@@ -32,10 +47,21 @@ func (s *Server) HandleWebSocket(c *gin.Context) {
 
 		fmt.Println("Received message:", message)
 
-		// Echo the message back to the client
 		err = conn.WriteMessage(websocket.TextMessage, message)
 		if err != nil {
 			break
+		}
+	}
+}
+
+/**
+* Websocket Message Hub to handle all messages.
+**/
+func (s *Server) MessageHub() {
+	for {
+		select {
+		case gameMove := <-s.serverChan:
+			fmt.Printf("Game move received: %+v\n\n", gameMove)
 		}
 	}
 }
