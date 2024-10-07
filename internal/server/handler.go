@@ -14,14 +14,15 @@ import (
 /**
 * Upgrades connection to websocket connection
 **/
-func (s *Server) HandleWebSocket(c *gin.Context) {
+func (s *Server) HandleWebSocketConn(c *gin.Context) {
 	// upgrade the HTTP connection to a WebSocket connection
 	conn, err := s.upgrader.Upgrade(c.Writer, c.Request, nil)
+
 	if err != nil {
+		fmt.Println("Error establishing websocket connection.")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "failed to upgrade connection"})
 		return
 	}
-	defer conn.Close()
 
 	s.serverChan <- GameMove{
 		Action:  "join_match",
@@ -39,6 +40,12 @@ func (s *Server) HandleWebSocket(c *gin.Context) {
 * Serves each individual connected client
 **/
 func (s *Server) ServeWsClient(conn *websocket.Conn) {
+	defer func() {
+		fmt.Println("Connection closed due to end of function.")
+		conn.Close()
+	}()
+
+	fmt.Printf("Starting listener for user %v", s.clientConns[conn])
 	for {
 		_, message, err := conn.ReadMessage()
 		if err != nil {
@@ -58,7 +65,9 @@ func (s *Server) ServeWsClient(conn *websocket.Conn) {
 * Websocket Message Hub to handle all messages.
 **/
 func (s *Server) MessageHub() {
+	fmt.Println("Starting Message Hub")
 	for {
+		fmt.Printf("Current client connections in session: %+v", s.clientConns)
 		select {
 		case gameMove := <-s.serverChan:
 			fmt.Printf("Game move received: %+v\n\n", gameMove)

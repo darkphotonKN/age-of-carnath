@@ -8,7 +8,7 @@ import (
 func SetupRoutes(server *server.Server) *gin.Engine {
 	r := gin.Default()
 
-	r.GET("/ws", server.HandleWebSocket)
+	r.GET("/ws", server.HandleWebSocketConn)
 
 	return r
 }

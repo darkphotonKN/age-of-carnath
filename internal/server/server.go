@@ -39,9 +39,10 @@ func NewServer(listenAddr string) *Server {
 		},
 	}
 	return &Server{
-		ListenAddr: listenAddr,
-		upgrader:   upgrader,
-		// TODO: update this to persist from DB
-		players: make(map[string]Player, player_limit),
+		ListenAddr:  listenAddr,
+		upgrader:    upgrader,
+		players:     make(map[string]Player, player_limit), // TODO: update this to persist from DB
+		clientConns: make(map[*websocket.Conn]Player, player_limit),
+		serverChan:  make(chan GameMove),
 	}
 }
