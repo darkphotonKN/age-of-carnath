@@ -5,10 +5,10 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func SetupRoutes(server *server.Server) *gin.Engine {
+func SetupRoutes(server *server.MultiplayerServer) *gin.Engine {
 	r := gin.Default()
 
-	r.GET("/ws", server.HandleWebSocketConn)
+	r.GET("/ws", server.HandleMatchSearch)
 
 	return r
 }

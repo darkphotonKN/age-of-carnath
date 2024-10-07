@@ -7,7 +7,7 @@ import "github.com/darkphotonKN/age-of-carnath/internal/server"
 * Uses DI for server access (via pointer).
 **/
 type Game struct {
-	server    *server.Server
+	server    *server.MultiplayerServer
 	GridState GridState
 }
 
@@ -53,7 +53,7 @@ type GridBlock struct {
 **/
 type GridState [][]GridBlock
 
-func NewGame(server *server.Server, gridRows uint8, gridCols uint8) *Game {
+func NewGame(server *server.MultiplayerServer, gridRows uint8, gridCols uint8) *Game {
 	newGrid := initializeGrid(gridRows, gridCols)
 
 	return &Game{

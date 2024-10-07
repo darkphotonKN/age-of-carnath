@@ -10,7 +10,7 @@ import (
 
 func main() {
 	port := ":4111"
-	server := server.NewServer(port)
+	server := server.NewMultiplayerServer(port)
 
 	go server.MessageHub()
 
