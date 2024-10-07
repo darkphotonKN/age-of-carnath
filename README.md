@@ -16,4 +16,4 @@ The client-side interface is developed in typescript reactjs with the nextjs fra
 
 - Game loop: Players take turns in combat, with actions communicated through WebSocket messages.
 
-- 1v1 player management and matchmaking: The server supports 1v1 matches. Matches between two players are handled and creates a unique instance between two players when a match is found, whereby their actions are handled and broadcast to each other.
+- 1v1 player management and matchmaking: The server supports 1v1 matches., with both players connecting via WebSocket and Matches between two players are handled and creates a unique instance between two players when a match is found, whereby their actions are handled and broadcast to each other.
