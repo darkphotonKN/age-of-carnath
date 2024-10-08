@@ -74,33 +74,6 @@ func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 }
 
 /**
-* Helps find a match for the player.
-**/
-func (s *MultiplayerServer) findMatch(player Player) {
-	// loop through current matches and find an opponent still waiting
-	for matchId, match := range s.matches {
-		// check length of match to know if its full
-		var matchFull bool = false
-		if len(match) == 2 {
-			matchFull = true
-		}
-
-		// join match if not full
-		if !matchFull {
-			s.matches[matchId] = append(s.matches[matchId], player)
-		}
-	}
-
-	// iteration over, meaning all matches are full, create a new one
-	newMatch := make([]Player, 2)
-	newMatch = append(newMatch, player)
-
-	// TODO: generate a new UUID
-	newMatchUuid := uuid.New()
-	s.matches[newMatchUuid] = newMatch
-}
-
-/**
 * Websocket Message Hub to handle all messages.
 **/
 func (s *MultiplayerServer) MessageHub() {
@@ -121,29 +94,64 @@ func (s *MultiplayerServer) MessageHub() {
 	}
 }
 
-type PrettyPrintPlayer struct {
+/**
+* Helps find a match for the player.
+**/
+func (s *MultiplayerServer) findMatch(player Player) {
+	// loop through current matches and find an opponent still waiting
+	for matchId, match := range s.matches {
+		// check length of match to know if its full
+		var matchFull bool = false
+		fmt.Println("Length of match:", len(match))
+
+		if len(match) == 2 {
+			matchFull = true
+		}
+
+		// join match if not full
+		if !matchFull {
+			s.matches[matchId] = append(s.matches[matchId], player)
+			// end search
+			return
+		}
+	}
+
+	// iteration over, meaning all matches are full, create a new one
+	newMatch := make([]Player, 2)
+	newMatch = append(newMatch, player)
+
+	// TODO: generate a new UUID
+	newMatchUuid := uuid.New()
+	s.matches[newMatchUuid] = newMatch
+}
+
+type PPPlayer struct {
 	id   string
 	name string
 }
 
-func PrettyPrintMatches(matches map[uuid.UUID][]Player) {
-	matchesToPrint := make(map[string][]PrettyPrintPlayer)
+// For pretty-fying matches for easier testing
+// TODO: Remove after testing
+func PrettyPrintMatches(matches map[uuid.UUID][]Player) map[string][]PPPlayer {
+	matchesToPrint := make(map[string][]PPPlayer)
 
 	// map over and convert byte slice keys to id strings
 	for index := range matches {
-		player1 := PrettyPrintPlayer{
+		player1 := PPPlayer{
 			id:   matches[index][0].id.String(),
 			name: matches[index][0].name,
 		}
 
-		player2 := PrettyPrintPlayer{
+		player2 := PPPlayer{
 			id:   matches[index][1].id.String(),
 			name: matches[index][1].name,
 		}
 
-		matchesToPrint[index.String()] = []PrettyPrintPlayer{player1, player2}
+		matchesToPrint[index.String()] = []PPPlayer{player1, player2}
 	}
 
 	// print result
-	fmt.Printf("PRETTY PRINT MATCHES: %+v\n\n\n", matchesToPrint)
+	// fmt.Printf("PRETTY PRINT MATCHES: %+v\n\n\n", matchesToPrint)
+
+	return matchesToPrint
 }

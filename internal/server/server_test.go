@@ -1,7 +1,6 @@
 package server
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/google/uuid"
@@ -14,17 +13,17 @@ func TestNewMultiplayerServer_FindMatch(t *testing.T) {
 	// setup mock matches
 	mockMatches := make(map[uuid.UUID][]Player)
 
-	// mockPlayerOneId := uuid.New()
+	mockPlayerOneId := uuid.New()
 	mockPlayerTwoId := uuid.New()
 	testPlayerId := uuid.New()
-	// gameOneId := uuid.New()
+	gameOneId := uuid.New()
 	gameTwoId := uuid.New()
 
 	// creating one full game
-	// mockMatches[gameOneId] = append(mockMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 1"})
-	// mockMatches[gameOneId] = append(mockMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 2"})
+	mockMatches[gameOneId] = append(mockMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 1"})
+	mockMatches[gameOneId] = append(mockMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 2"})
 	// creating one half full game
-	mockMatches[gameTwoId] = append(mockMatches[gameTwoId], Player{id: mockPlayerTwoId, name: "Mock Player 2"})
+	mockMatches[gameTwoId] = append(mockMatches[gameTwoId], Player{id: mockPlayerTwoId, name: "Mock Player 3"})
 
 	// pre-feed matches with these two games
 	testMultiplayerServer.matches = mockMatches
@@ -39,18 +38,14 @@ func TestNewMultiplayerServer_FindMatch(t *testing.T) {
 	testMultiplayerServer.findMatch(testPlayer)
 
 	expectedMatches := make(map[uuid.UUID][]Player)
-	// expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 1"})
-	// expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 2"})
-	expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], Player{id: mockPlayerTwoId, name: "Mock Player 2"})
+	expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 1"})
+	expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 2"})
+	expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], Player{id: mockPlayerTwoId, name: "Mock Player 3"})
 	expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], testPlayer)
 
-	fmt.Printf("EXPECTED\n\n")
+	expectedPrint := PrettyPrintMatches(expectedMatches)
 
-	PrettyPrintMatches(expectedMatches)
+	actualPrint := PrettyPrintMatches(testMultiplayerServer.matches)
 
-	fmt.Printf("ACTUAL\n\n")
-
-	PrettyPrintMatches(testMultiplayerServer.matches)
-
-	assert.Equal(t, expectedMatches, testMultiplayerServer.matches)
+	assert.Equal(t, expectedPrint, actualPrint)
 }
