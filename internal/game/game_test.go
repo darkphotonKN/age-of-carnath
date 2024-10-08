@@ -8,7 +8,7 @@ import (
 )
 
 func TestNewGame_GridState(t *testing.T) {
-	server := server.NewServer(":3333")
+	server := server.NewMultiplayerServer(":3333")
 	game := NewGame(server, 3, 3)
 
 	expectedGridState := GridState{

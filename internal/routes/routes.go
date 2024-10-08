@@ -8,7 +8,7 @@ import (
 func SetupRoutes(server *server.MultiplayerServer) *gin.Engine {
 	r := gin.Default()
 
-	r.GET("/ws", server.HandleMatchSearch)
+	r.GET("/ws", server.HandleMatchConn)
 
 	return r
 }

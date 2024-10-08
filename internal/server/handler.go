@@ -1,6 +1,7 @@
 package server
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -16,7 +17,7 @@ import (
 * Handles player searching for a match (incoming connection), upgrades them to webscoket connections,
 * and passes them off to individual goroutines to be handled concurrently.
 **/
-func (s *MultiplayerServer) HandleMatchSearch(c *gin.Context) {
+func (s *MultiplayerServer) HandleMatchConn(c *gin.Context) {
 	// upgrade the HTTP connection to a WebSocket connection
 	conn, err := s.upgrader.Upgrade(c.Writer, c.Request, nil)
 
@@ -26,16 +27,10 @@ func (s *MultiplayerServer) HandleMatchSearch(c *gin.Context) {
 		return
 	}
 
-	s.serverChan <- GameMove{
-		Action:  "join_match",
-		Payload: "123",
-	}
-
-	// set connection and player
-	s.clientConns[conn] = Player{id: "1", name: "guest"}
-
-	// find match for player
-	s.findMatch(conn)
+	// add player with a unique id to list of connections with their unique ws connection
+	// as a key
+	newPlayerId := uuid.New()
+	s.clientConns[conn] = Player{id: newPlayerId, name: "guest"}
 
 	// handle each connected client's messages concurrently
 	go s.ServeConnectedPlayer(conn)
@@ -57,13 +52,52 @@ func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 			break
 		}
 
-		fmt.Println("Received message:", message)
+		// decode message to pre-defined json structure
+		var decodedMsg GameMessage
 
-		err = conn.WriteMessage(websocket.TextMessage, message)
+		err = json.Unmarshal(message, &decodedMsg)
+
+		if err != nil {
+			fmt.Println("Error when decoding payload.")
+			conn.WriteJSON(GameMessage{Action: "Error", Payload: "Your message to server was the incorrect format and could not be decoded as JSON."})
+		}
+
+		fmt.Println("Received message as string:", string(message))
+
+		// send message to MessageHub for handling based on type
+		s.serverChan <- decodedMsg
+
 		if err != nil {
 			break
 		}
 	}
+}
+
+/**
+* Helps find a match for the player.
+**/
+func (s *MultiplayerServer) findMatch(player Player) {
+	// loop through current matches and find an opponent still waiting
+	for matchId, match := range s.matches {
+		// check length of match to know if its full
+		var matchFull bool = false
+		if len(match) == 2 {
+			matchFull = true
+		}
+
+		// join match if not full
+		if !matchFull {
+			s.matches[matchId] = append(s.matches[matchId], player)
+		}
+	}
+
+	// iteration over, meaning all matches are full, create a new one
+	newMatch := make([]Player, 2)
+	newMatch = append(newMatch, player)
+
+	// TODO: generate a new UUID
+	newMatchUuid := uuid.New()
+	s.matches[newMatchUuid] = newMatch
 }
 
 /**
@@ -76,35 +110,13 @@ func (s *MultiplayerServer) MessageHub() {
 		fmt.Printf("Current client connections in session: %+v\n\n", s.clientConns)
 		fmt.Printf("Current ongoing matches %+v\n\n", s.matches)
 		select {
-		case gameMove := <-s.serverChan:
-			fmt.Printf("Game move received: %+v\n\n", gameMove)
+		case gameMessage := <-s.serverChan:
+			fmt.Printf("Game message received: %+v\n\n", gameMessage)
+			switch gameMessage.Action {
+			case "find_match":
+				// TODO: update this to be their actual player from payload
+				s.findMatch(Player{id: uuid.New(), name: "Second player"})
+			}
 		}
 	}
-}
-
-/**
-* Helps find a match for the player.
-**/
-func (s *MultiplayerServer) findMatch(conn *websocket.Conn) {
-	// loop through current matches and find an opponent still waiting
-	for matchId, match := range s.matches {
-		// check length of match to know if its full
-		var matchFull bool = false
-		if len(match) == 2 {
-			matchFull = true
-		}
-
-		// join match if not full
-		if !matchFull {
-			s.matches[matchId] = append(s.matches[matchId], Player{id: "123", name: "placeholder"})
-		}
-	}
-
-	// iteration over, meaning all matches are full, create a new one
-	newMatch := make([]Player, 2)
-	newMatch = append(newMatch, Player{id: "321", name: "creatorplaceholder"})
-
-	// TODO: generate a new UUID
-	newMatcUuid := uuid.New()
-	s.matches[newMatcUuid] = newMatch
 }
