@@ -6,7 +6,7 @@ export default function Home() {
     <div className="flex flex-col justify-center content-center h-full">
       <Link href="/game">
         <Button variant="default" size="default">
-          Start
+          Find Match
         </Button>
       </Link>
     </div>

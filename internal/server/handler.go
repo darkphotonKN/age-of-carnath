@@ -120,3 +120,30 @@ func (s *MultiplayerServer) MessageHub() {
 		}
 	}
 }
+
+type PrettyPrintPlayer struct {
+	id   string
+	name string
+}
+
+func PrettyPrintMatches(matches map[uuid.UUID][]Player) {
+	matchesToPrint := make(map[string][]PrettyPrintPlayer)
+
+	// map over and convert byte slice keys to id strings
+	for index := range matches {
+		player1 := PrettyPrintPlayer{
+			id:   matches[index][0].id.String(),
+			name: matches[index][0].name,
+		}
+
+		player2 := PrettyPrintPlayer{
+			id:   matches[index][1].id.String(),
+			name: matches[index][1].name,
+		}
+
+		matchesToPrint[index.String()] = []PrettyPrintPlayer{player1, player2}
+	}
+
+	// print result
+	fmt.Printf("PRETTY PRINT MATCHES: %+v\n\n\n", matchesToPrint)
+}
