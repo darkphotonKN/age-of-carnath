@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/google/uuid"
@@ -24,6 +25,8 @@ func TestNewMultiplayerServer_FindMatch(t *testing.T) {
 	mockMatches[gameOneId] = append(mockMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 2"})
 	// creating one half full game
 	mockMatches[gameTwoId] = append(mockMatches[gameTwoId], Player{id: mockPlayerTwoId, name: "Mock Player 3"})
+	// mockMatches[gameTwoId] = append(mockMatches[gameTwoId], Player{id: mockPlayerTwoId, name: "Mock Player 4"})
+	mockMatches[gameTwoId] = append(mockMatches[gameTwoId], Player{id: mockPlayerTwoId, name: "TESST PLAYER"})
 
 	// pre-feed matches with these two games
 	testMultiplayerServer.matches = mockMatches
@@ -35,17 +38,20 @@ func TestNewMultiplayerServer_FindMatch(t *testing.T) {
 	}
 
 	// find a new match to test match find logic
-	testMultiplayerServer.findMatch(testPlayer)
+	matchFoundId := testMultiplayerServer.findMatch(testPlayer)
+	fmt.Println("matchFoundId:", matchFoundId)
 
 	expectedMatches := make(map[uuid.UUID][]Player)
 	expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 1"})
 	expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 2"})
 	expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], Player{id: mockPlayerTwoId, name: "Mock Player 3"})
-	expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], testPlayer)
+	// expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], Player{id: mockPlayerTwoId, name: "Mock Player 4"})
+	// expectedMatches[matchFoundId] = append(expectedMatches[gameTwoId], testPlayer)
+	// expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], testPlayer)
 
-	expectedPrint := PrettyPrintMatches(expectedMatches)
+	expectedPrint := MapIdStringMatches(expectedMatches)
 
-	actualPrint := PrettyPrintMatches(testMultiplayerServer.matches)
+	actualPrint := MapIdStringMatches(testMultiplayerServer.matches)
 
 	assert.Equal(t, expectedPrint, actualPrint)
 }

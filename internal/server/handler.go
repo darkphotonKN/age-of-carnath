@@ -97,7 +97,7 @@ func (s *MultiplayerServer) MessageHub() {
 /**
 * Helps find a match for the player.
 **/
-func (s *MultiplayerServer) findMatch(player Player) {
+func (s *MultiplayerServer) findMatch(player Player) uuid.UUID {
 	// loop through current matches and find an opponent still waiting
 	for matchId, match := range s.matches {
 		// check length of match to know if its full
@@ -112,7 +112,7 @@ func (s *MultiplayerServer) findMatch(player Player) {
 		if !matchFull {
 			s.matches[matchId] = append(s.matches[matchId], player)
 			// end search
-			return
+			return matchId
 		}
 	}
 
@@ -120,34 +120,35 @@ func (s *MultiplayerServer) findMatch(player Player) {
 	newMatch := make([]Player, 2)
 	newMatch = append(newMatch, player)
 
-	// TODO: generate a new UUID
 	newMatchUuid := uuid.New()
 	s.matches[newMatchUuid] = newMatch
+
+	return newMatchUuid
 }
 
-type PPPlayer struct {
+type PlayerIdString struct {
 	id   string
 	name string
 }
 
-// For pretty-fying matches for easier testing
-// TODO: Remove after testing
-func PrettyPrintMatches(matches map[uuid.UUID][]Player) map[string][]PPPlayer {
-	matchesToPrint := make(map[string][]PPPlayer)
+// For pretty-fying matches for easier testing by mapping each id from a UUID
+// to a string
+func MapIdStringMatches(matches map[uuid.UUID][]Player) map[string][]PlayerIdString {
+	matchesToPrint := make(map[string][]PlayerIdString)
 
 	// map over and convert byte slice keys to id strings
 	for index := range matches {
-		player1 := PPPlayer{
+		player1 := PlayerIdString{
 			id:   matches[index][0].id.String(),
 			name: matches[index][0].name,
 		}
 
-		player2 := PPPlayer{
+		player2 := PlayerIdString{
 			id:   matches[index][1].id.String(),
 			name: matches[index][1].name,
 		}
 
-		matchesToPrint[index.String()] = []PPPlayer{player1, player2}
+		matchesToPrint[index.String()] = []PlayerIdString{player1, player2}
 	}
 
 	// print result
