@@ -37,7 +37,7 @@ func (s *MultiplayerServer) HandleMatchConn(c *gin.Context) {
 }
 
 /**
-* Serves each individual connected player
+* Serves each individual connected player.
 **/
 func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 	defer func() {
@@ -45,7 +45,7 @@ func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 		conn.Close()
 	}()
 
-	fmt.Printf("Starting listener for user %v", s.clientConns[conn])
+	fmt.Printf("Starting listener for user %v\n", s.clientConns[conn])
 	for {
 		_, message, err := conn.ReadMessage()
 		if err != nil {
@@ -66,31 +66,6 @@ func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 
 		// send message to MessageHub for handling based on type
 		s.serverChan <- decodedMsg
-
-		if err != nil {
-			break
-		}
-	}
-}
-
-/**
-* Websocket Message Hub to handle all messages.
-**/
-func (s *MultiplayerServer) MessageHub() {
-	fmt.Println("Starting Message Hub")
-
-	for {
-		fmt.Printf("Current client connections in session: %+v\n\n", s.clientConns)
-		fmt.Printf("Current ongoing matches %+v\n\n", s.matches)
-		select {
-		case gameMessage := <-s.serverChan:
-			fmt.Printf("Game message received: %+v\n\n", gameMessage)
-			switch gameMessage.Action {
-			case "find_match":
-				// TODO: update this to be their actual player from payload
-				s.findMatch(Player{id: uuid.New(), name: "Second player"})
-			}
-		}
 	}
 }
 
@@ -116,8 +91,8 @@ func (s *MultiplayerServer) findMatch(player Player) uuid.UUID {
 	}
 
 	// iteration over, meaning all matches are full, create a new one
-	newMatch := make([]Player, 2)
-	newMatch[0] = player
+
+	newMatch := []Player{player}
 
 	newMatchUuid := uuid.New()
 	s.matches[newMatchUuid] = newMatch

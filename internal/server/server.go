@@ -25,8 +25,9 @@ type GameMessage struct {
 * Primary struct on the websocket server instance and its performance.
 **/
 type MultiplayerServer struct {
-	ListenAddr  string
-	upgrader    websocket.Upgrader
+	ListenAddr string
+	upgrader   websocket.Upgrader
+	// TODO: Update this to database struct
 	players     map[string]Player          // all players that can play
 	clientConns map[*websocket.Conn]Player // all currently connected players from all match connections
 	matches     map[uuid.UUID][]Player     // all ongoing matches
@@ -36,7 +37,7 @@ type MultiplayerServer struct {
 func NewMultiplayerServer(listenAddr string) *MultiplayerServer {
 	upgrader := websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
-			// Allow all connections by default for simplicity; you can add more logic here
+			// TODO: Allow all connections by default for simplicity; can add more logic here
 			return true
 		},
 	}

@@ -46,8 +46,10 @@ func TestNewMultiplayerServer_FindMatch_HalfFull(t *testing.T) {
 	expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], Player{id: mockPlayerThreeId, name: "Mock Player 3"})
 	expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], testPlayer)
 
+	fmt.Print("EXPECTED: ")
 	expectedPrint := MapIdStringMatches(expectedMatches)
 
+	fmt.Print("ACTUAL: ")
 	actualPrint := MapIdStringMatches(testMultiplayerServer.matches)
 
 	assert.Equal(t, expectedPrint, actualPrint)
@@ -101,11 +103,63 @@ func TestNewMultiplayerServer_FindMatch_Full(t *testing.T) {
 	expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], Player{id: mockPlayerFourId, name: "Mock Player 4"})
 	expectedMatches[matchFoundId] = append(expectedMatches[matchFoundId], testPlayer)
 
-	// empty match slot since defaulting the match lengths to be 2, the real match will have a slot with an empty player too
-	expectedMatches[matchFoundId] = append(expectedMatches[matchFoundId], Player{})
-
 	expectedPrint := MapIdStringMatches(expectedMatches)
 
+	actualPrint := MapIdStringMatches(testMultiplayerServer.matches)
+
+	assert.Equal(t, expectedPrint, actualPrint)
+}
+
+// -- Multiple player joins via findMatch Test --
+func TestNewMultiplayerServer_FindMatch_Multiple(t *testing.T) {
+	fmt.Println("Testing Find Match --- Multiple Matches")
+	testMultiplayerServer := NewMultiplayerServer(":3636")
+
+	// setup mock matches
+	mockMatches := make(map[uuid.UUID][]Player)
+
+	mockPlayerOneId := uuid.New()
+	testPlayerId := uuid.New()
+	testPlayerTwoId := uuid.New()
+	testPlayerThreeId := uuid.New()
+	gameOneId := uuid.New()
+
+	// setup test players to be added
+	testPlayer := Player{
+		id:   testPlayerId,
+		name: "TEST PLAYER",
+	}
+
+	testPlayer2 := Player{
+		id:   testPlayerTwoId,
+		name: "TEST PLAYER 2",
+	}
+
+	testPlayer3 := Player{
+		id:   testPlayerThreeId,
+		name: "TEST PLAYER 3",
+	}
+
+	mockMatches[gameOneId] = append(mockMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 1"})
+
+	// pre-feed matches with these two games
+	testMultiplayerServer.matches = mockMatches
+
+	// simulate MULTIPLE findMatch and test the results
+	matchFoundIdOne := testMultiplayerServer.findMatch(testPlayer)
+	matchFoundIdTwo := testMultiplayerServer.findMatch(testPlayer2)
+	testMultiplayerServer.findMatch(testPlayer3)
+
+	expectedMatches := make(map[uuid.UUID][]Player)
+	expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 1"})
+	expectedMatches[matchFoundIdOne] = append(expectedMatches[matchFoundIdOne], testPlayer)
+	expectedMatches[matchFoundIdTwo] = append(expectedMatches[matchFoundIdTwo], testPlayer2)
+	expectedMatches[matchFoundIdTwo] = append(expectedMatches[matchFoundIdTwo], testPlayer3)
+
+	fmt.Print("EXPECTED: ")
+	expectedPrint := MapIdStringMatches(expectedMatches)
+
+	fmt.Print("ACTUAL: ")
 	actualPrint := MapIdStringMatches(testMultiplayerServer.matches)
 
 	assert.Equal(t, expectedPrint, actualPrint)
