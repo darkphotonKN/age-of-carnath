@@ -104,9 +104,8 @@ func (s *MultiplayerServer) findMatch(player Player) uuid.UUID {
 		var matchFull bool = false
 		fmt.Println("Length of match:", len(match))
 
-		if len(match) == 2 {
-			matchFull = true
-		}
+		// match is full is length of match has reached 2
+		matchFull = len(match) == 2
 
 		// join match if not full
 		if !matchFull {
@@ -118,7 +117,7 @@ func (s *MultiplayerServer) findMatch(player Player) uuid.UUID {
 
 	// iteration over, meaning all matches are full, create a new one
 	newMatch := make([]Player, 2)
-	newMatch = append(newMatch, player)
+	newMatch[0] = player
 
 	newMatchUuid := uuid.New()
 	s.matches[newMatchUuid] = newMatch
@@ -138,21 +137,27 @@ func MapIdStringMatches(matches map[uuid.UUID][]Player) map[string][]PlayerIdStr
 
 	// map over and convert byte slice keys to id strings
 	for index := range matches {
-		player1 := PlayerIdString{
-			id:   matches[index][0].id.String(),
-			name: matches[index][0].name,
+		var player1, player2 PlayerIdString
+
+		if len(matches[index]) > 0 {
+			player1 = PlayerIdString{
+				id:   matches[index][0].id.String(),
+				name: matches[index][0].name,
+			}
 		}
 
-		player2 := PlayerIdString{
-			id:   matches[index][1].id.String(),
-			name: matches[index][1].name,
+		if len(matches[index]) > 1 {
+			player2 = PlayerIdString{
+				id:   matches[index][1].id.String(),
+				name: matches[index][1].name,
+			}
 		}
 
 		matchesToPrint[index.String()] = []PlayerIdString{player1, player2}
 	}
 
 	// print result
-	// fmt.Printf("PRETTY PRINT MATCHES: %+v\n\n\n", matchesToPrint)
+	fmt.Printf("PRETTY PRINT MATCHES: %v\n\n\n", matchesToPrint)
 
 	return matchesToPrint
 }
