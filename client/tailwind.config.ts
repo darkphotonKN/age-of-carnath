@@ -6,10 +6,22 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontSize: {
+        base: "18px",
+      },
       colors: {
         customGray: "#E2E8F0",
         customBorderGray: "#CBD5E1",
         customBgGray: "#F8FAFC",
+        primary: "#F8FAFC",
+        primaryForeground: "#ffffff",
+        destructive: "#dc2626",
+        destructiveForeground: "#ffffff",
+        background: "#f3f4f6",
+        accent: "#4b5563",
+        accentForeground: "#f9fafb",
+        ring: "#3b82f6",
+        input: "#9ca3af",
       },
       boxShadow: {
         customBlockShadow:

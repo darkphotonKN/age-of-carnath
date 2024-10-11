@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { EB_Garamond, Cinzel } from "next/font/google";
+import { EB_Garamond } from "next/font/google";
 
-const fontFamily = Cinzel({
+const fontFamily = EB_Garamond({
   weight: ["400", "500", "700"],
   style: "normal",
   subsets: ["latin"],
@@ -22,10 +22,10 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={
-          fontFamily.className + " bg-customGray p-[50px] min-h-screen"
+          fontFamily.className + " bg-customGray p-[50px] h-screen min-h-screen"
         }
       >
-        <h1 className="text-3xl font-medium text-center">Age of Carnath</h1>
+        <h1 className="text-4xl font-medium text-center">Age of Carnath</h1>
         {children}
       </body>
     </html>

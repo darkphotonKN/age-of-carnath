@@ -55,7 +55,7 @@ func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 			// that matches the two types listed, we close return the loop and
 			// close it immediately (via the defer)
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				fmt.Printf("Abormal error occured with connection %v. Closing connection.\n", conn)
+				fmt.Printf("Abormal error occured with player %v. Closing connection.\n", s.clientConns[conn])
 			}
 			break
 		}
@@ -69,8 +69,6 @@ func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 			fmt.Println("Error when decoding payload.")
 			conn.WriteJSON(GameMessage{Action: "Error", Payload: "Your message to server was the incorrect format and could not be decoded as JSON."})
 		}
-
-		fmt.Println("Received message as string:", string(message))
 
 		clientPackage := ClientPackage{GameMessage: decodedMsg, Conn: conn}
 
@@ -97,10 +95,31 @@ func (s *MultiplayerServer) removeClient(conn *websocket.Conn) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
-	if _, ok := s.clientConns[conn]; ok {
+	if client, ok := s.clientConns[conn]; ok {
 		conn.Close()
+		// remove them from the match and stops the match
+		s.StopMatch(client.ID)
+
+		// remove from list of connections
 		delete(s.clientConns, conn)
 	}
+}
+
+/**
+* Stops a match and removes it from the map of matches that a player belongs to. TODO: stop the match
+**/
+func (s *MultiplayerServer) StopMatch(playerId uuid.UUID) error {
+	// search for player in a match
+	for matchIndex, players := range s.matches {
+		for _, player := range players {
+			if player.ID == playerId {
+				// stop and remove match
+				delete(s.matches, matchIndex)
+				return nil
+			}
+		}
+	}
+	return fmt.Errorf("No player with this id was found in any on-going match.")
 }
 
 /**
