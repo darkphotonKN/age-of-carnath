@@ -38,9 +38,11 @@ func (s *MultiplayerServer) HandleMatchConn(c *gin.Context) {
 * a single client from locking the entire server.
 **/
 func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
+
+	// removes client and closes connection
 	defer func() {
 		fmt.Println("Connection closed due to end of function.")
-		conn.Close()
+		s.removeClient(conn)
 	}()
 
 	fmt.Printf("Starting listener for user %v\n", s.clientConns[conn])
@@ -54,8 +56,9 @@ func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 			// that matches the two types listed, we close return the loop and
 			// close it immediately (via the defer)
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				break
+				fmt.Errorf("Abormal error occured with connection %v. Closing connection.\n", conn)
 			}
+			break
 		}
 
 		// decode message to pre-defined json structure
