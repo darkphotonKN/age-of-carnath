@@ -53,8 +53,15 @@ func (gm *GameMessage) ParsePayload() error {
 		fmt.Println("idStr:", idStr)
 		fmt.Println("name:", name)
 
+		idUUID, err := uuid.Parse(idStr)
+
+		if err != nil {
+			fmt.Println("Could not parse id into a UUID.")
+			return fmt.Errorf("Could not parse id into a UUID.")
+		}
+
 		convertedPlayer := Player{
-			ID:   uuid.New(),
+			ID:   idUUID,
 			Name: name,
 		}
 
