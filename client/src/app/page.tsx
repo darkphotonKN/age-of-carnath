@@ -1,4 +1,5 @@
 "use client";
+import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/Button";
 import { GameAction } from "@/constants/enums";
 import { GamePayload, Player } from "@/game/types";
@@ -7,6 +8,7 @@ import { useEffect, useState } from "react";
 
 export default function Home() {
   const [connect, setConnect] = useState(false);
+
   // connect to websocket
   const { ws } = useWebSocketServer({
     connectToWebSocket: connect,
@@ -18,21 +20,21 @@ export default function Home() {
   function handleFindMatch() {
     setConnect(true);
   }
+
   useEffect(() => {
-    if (ws) {
+    console.log("ws.readyState:", ws?.readyState);
+    if (ws && ws.readyState === WebSocket.OPEN) {
       const messagePayload: GamePayload<Player> = {
         action: GameAction.FIND_MATCH,
         payload: {
-          id: "123",
+          id: uuidv4(),
           name: "test first ever player",
         },
       };
       // start matchmaking
-      setTimeout(() => {
-        ws.send(JSON.stringify(messagePayload));
-      }, 2000);
+      ws.send(JSON.stringify(messagePayload));
     }
-  }, [ws]);
+  }, [ws, ws?.readyState]);
 
   return (
     <div className="flex flex-col justify-center content-center h-full">

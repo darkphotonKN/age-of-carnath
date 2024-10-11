@@ -26,6 +26,7 @@ export default function useWebSocketServer({
 
     socket.onopen = () => {
       console.log("Connected to WebSocket server!");
+      setWs(socket);
     };
 
     socket.onerror = (error) => {
@@ -49,9 +50,6 @@ export default function useWebSocketServer({
     socket.onclose = () => {
       console.log("Disconnected from WebSocket server.");
     };
-
-    // Set WebSocket to state for persistent usage
-    setWs(socket);
 
     // Cleanup when component unmounts
     return () => {

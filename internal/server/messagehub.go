@@ -17,21 +17,24 @@ func (s *MultiplayerServer) MessageHub() {
 		case clientPackage := <-s.serverChan:
 			fmt.Printf("Client Package received: %+v\n\n", clientPackage)
 
-			gameMessage := clientPackage.GameMessage
+			err := clientPackage.GameMessage.ParsePayload()
 
-			switch gameMessage.Action {
+			if err != nil {
+				fmt.Printf("Error occured when attempting to parse payload: %s\n", err)
+				clientPackage.Conn.WriteJSON("Error attempting to parse payload.")
+				continue
+			}
+
+			switch clientPackage.GameMessage.Action {
 			case "find_match":
-				fmt.Println("Inside find Match")
+				fmt.Println("Inside 'find match' case, payload:", clientPackage.GameMessage.Payload)
 
-				// add player with a unique id to list of connections with their unique ws connection
-				// as a key
-				player, ok := gameMessage.Payload.(Player) // assert that player was the payload in the case of find match
-				fmt.Printf("player assertion ok: %t.\n", ok)
+				// assert Payload type specific to gameMessage.Action == "find_match", which is Player
+				player, ok := clientPackage.GameMessage.Payload.(Player)
 
 				if !ok {
-					fmt.Errorf("Player was not in the payload of join_match action.\n")
-
-					clientPackage.Conn.WriteJSON("Player was not in the payload of join_match action.")
+					fmt.Printf("Error attempting to assert player from payload.\n")
+					clientPackage.Conn.WriteJSON("Error attempting to assert player from payload.")
 					continue
 				}
 
@@ -40,7 +43,6 @@ func (s *MultiplayerServer) MessageHub() {
 				// initiating finding a match for the player
 				s.findMatch(player)
 			}
-
 		}
 	}
 }

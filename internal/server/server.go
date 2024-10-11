@@ -17,12 +17,6 @@ const (
 	player_limit = 5000
 )
 
-// payload of game message for communication between client-server
-type GameMessage struct {
-	Action  string      `json:"action"`
-	Payload interface{} `json:"payload"`
-}
-
 // to group GameMessage along with the websocket connection to pass to message hub for handling
 type ClientPackage struct {
 	GameMessage GameMessage
