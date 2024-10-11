@@ -38,7 +38,6 @@ func (s *MultiplayerServer) HandleMatchConn(c *gin.Context) {
 * a single client from locking the entire server.
 **/
 func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
-
 	// removes client and closes connection
 	defer func() {
 		fmt.Println("Connection closed due to end of function.")
@@ -56,7 +55,7 @@ func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 			// that matches the two types listed, we close return the loop and
 			// close it immediately (via the defer)
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				fmt.Errorf("Abormal error occured with connection %v. Closing connection.\n", conn)
+				fmt.Printf("Abormal error occured with connection %v. Closing connection.\n", conn)
 			}
 			break
 		}
@@ -108,6 +107,8 @@ func (s *MultiplayerServer) removeClient(conn *websocket.Conn) {
 * Helps find a match for the player.
 **/
 func (s *MultiplayerServer) findMatch(player Player) uuid.UUID {
+	fmt.Println("Finding match...")
+
 	// loop through current matches and find an opponent still waiting
 	for matchId, match := range s.matches {
 		// check length of match to know if its full
@@ -151,15 +152,15 @@ func MapIdStringMatches(matches map[uuid.UUID][]Player) map[string][]PlayerIdStr
 
 		if len(matches[index]) > 0 {
 			player1 = PlayerIdString{
-				id:   matches[index][0].id.String(),
-				name: matches[index][0].name,
+				id:   matches[index][0].ID.String(),
+				name: matches[index][0].Name,
 			}
 		}
 
 		if len(matches[index]) > 1 {
 			player2 = PlayerIdString{
-				id:   matches[index][1].id.String(),
-				name: matches[index][1].name,
+				id:   matches[index][1].ID.String(),
+				name: matches[index][1].Name,
 			}
 		}
 

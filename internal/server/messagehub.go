@@ -21,13 +21,20 @@ func (s *MultiplayerServer) MessageHub() {
 
 			switch gameMessage.Action {
 			case "find_match":
+				fmt.Println("Inside find Match")
+
 				// add player with a unique id to list of connections with their unique ws connection
 				// as a key
 				player, ok := gameMessage.Payload.(Player) // assert that player was the payload in the case of find match
+				fmt.Printf("player assertion ok: %t.\n", ok)
+
 				if !ok {
+					fmt.Errorf("Player was not in the payload of join_match action.\n")
+
 					clientPackage.Conn.WriteJSON("Player was not in the payload of join_match action.")
 					continue
 				}
+
 				s.addClient(clientPackage.Conn, player)
 
 				// initiating finding a match for the player

@@ -9,8 +9,8 @@ import (
 )
 
 type Player struct {
-	id   uuid.UUID
-	name string
+	ID   uuid.UUID `json:"id"`
+	Name string    `json:"name"`
 }
 
 const (

@@ -25,13 +25,13 @@ func TestNewMultiplayerServer_FindMatch_HalfFull(t *testing.T) {
 
 	// setup test player to be added
 	testPlayer := Player{
-		id:   testPlayerId,
-		name: "TEST PLAYER",
+		ID:   testPlayerId,
+		Name: "TEST PLAYER",
 	}
 
-	mockMatches[gameOneId] = append(mockMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 1"})
-	mockMatches[gameOneId] = append(mockMatches[gameOneId], Player{id: mockPlayerTwoId, name: "Mock Player 2"})
-	mockMatches[gameTwoId] = append(mockMatches[gameTwoId], Player{id: mockPlayerThreeId, name: "Mock Player 3"})
+	mockMatches[gameOneId] = append(mockMatches[gameOneId], Player{ID: mockPlayerOneId, Name: "Mock Player 1"})
+	mockMatches[gameOneId] = append(mockMatches[gameOneId], Player{ID: mockPlayerTwoId, Name: "Mock Player 2"})
+	mockMatches[gameTwoId] = append(mockMatches[gameTwoId], Player{ID: mockPlayerThreeId, Name: "Mock Player 3"})
 
 	// pre-feed matches with these two games
 	testMultiplayerServer.matches = mockMatches
@@ -41,9 +41,9 @@ func TestNewMultiplayerServer_FindMatch_HalfFull(t *testing.T) {
 	fmt.Println("matchFoundId:", matchFoundId)
 
 	expectedMatches := make(map[uuid.UUID][]Player)
-	expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 1"})
-	expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{id: mockPlayerTwoId, name: "Mock Player 2"})
-	expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], Player{id: mockPlayerThreeId, name: "Mock Player 3"})
+	expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{ID: mockPlayerOneId, Name: "Mock Player 1"})
+	expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{ID: mockPlayerTwoId, Name: "Mock Player 2"})
+	expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], Player{ID: mockPlayerThreeId, Name: "Mock Player 3"})
 	expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], testPlayer)
 
 	fmt.Print("EXPECTED: ")
@@ -73,14 +73,14 @@ func TestNewMultiplayerServer_FindMatch_Full(t *testing.T) {
 
 	// setup test player to be added
 	testPlayer := Player{
-		id:   testPlayerId,
-		name: "TEST PLAYER",
+		ID:   testPlayerId,
+		Name: "TEST PLAYER",
 	}
 
-	mockMatches[gameOneId] = append(mockMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 1"})
-	mockMatches[gameOneId] = append(mockMatches[gameOneId], Player{id: mockPlayerTwoId, name: "Mock Player 2"})
-	mockMatches[gameTwoId] = append(mockMatches[gameTwoId], Player{id: mockPlayerThreeId, name: "Mock Player 3"})
-	mockMatches[gameTwoId] = append(mockMatches[gameTwoId], Player{id: mockPlayerFourId, name: "Mock Player 4"})
+	mockMatches[gameOneId] = append(mockMatches[gameOneId], Player{ID: mockPlayerOneId, Name: "Mock Player 1"})
+	mockMatches[gameOneId] = append(mockMatches[gameOneId], Player{ID: mockPlayerTwoId, Name: "Mock Player 2"})
+	mockMatches[gameTwoId] = append(mockMatches[gameTwoId], Player{ID: mockPlayerThreeId, Name: "Mock Player 3"})
+	mockMatches[gameTwoId] = append(mockMatches[gameTwoId], Player{ID: mockPlayerFourId, Name: "Mock Player 4"})
 
 	// pre-feed matches with these two games
 	testMultiplayerServer.matches = mockMatches
@@ -97,10 +97,10 @@ func TestNewMultiplayerServer_FindMatch_Full(t *testing.T) {
 		expectedMatches[matchFoundId] = []Player{}
 	}
 
-	expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 1"})
-	expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{id: mockPlayerTwoId, name: "Mock Player 2"})
-	expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], Player{id: mockPlayerThreeId, name: "Mock Player 3"})
-	expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], Player{id: mockPlayerFourId, name: "Mock Player 4"})
+	expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{ID: mockPlayerOneId, Name: "Mock Player 1"})
+	expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{ID: mockPlayerTwoId, Name: "Mock Player 2"})
+	expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], Player{ID: mockPlayerThreeId, Name: "Mock Player 3"})
+	expectedMatches[gameTwoId] = append(expectedMatches[gameTwoId], Player{ID: mockPlayerFourId, Name: "Mock Player 4"})
 	expectedMatches[matchFoundId] = append(expectedMatches[matchFoundId], testPlayer)
 
 	expectedPrint := MapIdStringMatches(expectedMatches)
@@ -126,21 +126,21 @@ func TestNewMultiplayerServer_FindMatch_Multiple(t *testing.T) {
 
 	// setup test players to be added
 	testPlayer := Player{
-		id:   testPlayerId,
-		name: "TEST PLAYER",
+		ID:   testPlayerId,
+		Name: "TEST PLAYER",
 	}
 
 	testPlayer2 := Player{
-		id:   testPlayerTwoId,
-		name: "TEST PLAYER 2",
+		ID:   testPlayerTwoId,
+		Name: "TEST PLAYER 2",
 	}
 
 	testPlayer3 := Player{
-		id:   testPlayerThreeId,
-		name: "TEST PLAYER 3",
+		ID:   testPlayerThreeId,
+		Name: "TEST PLAYER 3",
 	}
 
-	mockMatches[gameOneId] = append(mockMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 1"})
+	mockMatches[gameOneId] = append(mockMatches[gameOneId], Player{ID: mockPlayerOneId, Name: "Mock Player 1"})
 
 	// pre-feed matches with these two games
 	testMultiplayerServer.matches = mockMatches
@@ -151,7 +151,7 @@ func TestNewMultiplayerServer_FindMatch_Multiple(t *testing.T) {
 	testMultiplayerServer.findMatch(testPlayer3)
 
 	expectedMatches := make(map[uuid.UUID][]Player)
-	expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{id: mockPlayerOneId, name: "Mock Player 1"})
+	expectedMatches[gameOneId] = append(expectedMatches[gameOneId], Player{ID: mockPlayerOneId, Name: "Mock Player 1"})
 	expectedMatches[matchFoundIdOne] = append(expectedMatches[matchFoundIdOne], testPlayer)
 	expectedMatches[matchFoundIdTwo] = append(expectedMatches[matchFoundIdTwo], testPlayer2)
 	expectedMatches[matchFoundIdTwo] = append(expectedMatches[matchFoundIdTwo], testPlayer3)
