@@ -2,8 +2,6 @@ package server
 
 import (
 	"fmt"
-
-	"github.com/google/uuid"
 )
 
 /**
@@ -16,15 +14,26 @@ func (s *MultiplayerServer) MessageHub() {
 		fmt.Printf("Current client connections in session: %+v\n\n", s.clientConns)
 		fmt.Printf("Current ongoing matches %+v\n\n", s.matches)
 		select {
-		case gameMessage := <-s.serverChan:
-			fmt.Printf("Game message received: %+v\n\n", gameMessage)
+		case clientPackage := <-s.serverChan:
+			fmt.Printf("Client Package received: %+v\n\n", clientPackage)
+
+			gameMessage := clientPackage.GameMessage
+
 			switch gameMessage.Action {
 			case "find_match":
-				// TODO: update this to be their actual player from payload
+				// add player with a unique id to list of connections with their unique ws connection
+				// as a key
+				player, ok := gameMessage.Payload.(Player) // assert that player was the payload in the case of find match
+				if !ok {
+					clientPackage.Conn.WriteJSON("Player was not in the payload of join_match action.")
+					continue
+				}
+				s.addClient(clientPackage.Conn, player)
 
-				fmt.Println("Finding a match...")
-				s.findMatch(Player{id: uuid.New(), name: "Second player"})
+				// initiating finding a match for the player
+				s.findMatch(player)
 			}
+
 		}
 	}
 }

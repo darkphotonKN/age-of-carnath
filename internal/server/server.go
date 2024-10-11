@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
@@ -16,9 +17,16 @@ const (
 	player_limit = 5000
 )
 
+// payload of game message for communication between client-server
 type GameMessage struct {
-	Action  string `json:"action"`
-	Payload string `json:"payload"`
+	Action  string      `json:"action"`
+	Payload interface{} `json:"payload"`
+}
+
+// to group GameMessage along with the websocket connection to pass to message hub for handling
+type ClientPackage struct {
+	GameMessage GameMessage
+	Conn        *websocket.Conn
 }
 
 /**
@@ -31,7 +39,8 @@ type MultiplayerServer struct {
 	players     map[string]Player          // all players that can play
 	clientConns map[*websocket.Conn]Player // all currently connected players from all match connections
 	matches     map[uuid.UUID][]Player     // all ongoing matches
-	serverChan  chan GameMessage
+	serverChan  chan ClientPackage
+	mu          sync.Mutex
 }
 
 func NewMultiplayerServer(listenAddr string) *MultiplayerServer {
@@ -41,12 +50,13 @@ func NewMultiplayerServer(listenAddr string) *MultiplayerServer {
 			return true
 		},
 	}
+
 	return &MultiplayerServer{
 		ListenAddr:  listenAddr,
 		upgrader:    upgrader,
 		players:     make(map[string]Player, player_limit), // TODO: update this to persist from DB
 		clientConns: make(map[*websocket.Conn]Player, player_limit),
 		matches:     make(map[uuid.UUID][]Player),
-		serverChan:  make(chan GameMessage),
+		serverChan:  make(chan ClientPackage),
 	}
 }

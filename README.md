@@ -17,3 +17,15 @@ The client-side interface is developed in typescript reactjs with the nextjs fra
 - Game loop: Players take turns in combat, with actions communicated through WebSocket messages.
 
 - 1v1 player management and matchmaking: The server supports 1v1 matches., with both players connecting via WebSocket and Matches between two players are handled and creates a unique instance between two players when a match is found, whereby their actions are handled and broadcast to each other.
+
+### Game Server
+
+The protocol chosen was Websockets over TCP for the ease of use. However, there were still some design decisions that went into the game server's system design.
+
+#### Using Unbuffered Channels
+
+Since Gorilla Websocket was the most reliable websocket package in Go at the time of writing this project, it was used to create the entire websocket server for players to find matches and for the game's live action handling and tracking.
+
+There was a big design decision to use **unbuffered** channels as a result, since there are analysis that show that the package only allows _one concurrent client to write to the server at once_. This means one client could potentially lock the entire server with message spam if unbuffered channels weren't used. Overall this prevented a huge number of writes to the server at the same time.
+
+A simple read / write loop for websockets therefore turned into a slighty more complex read / write via websocket and with a communication layer via an unbuffered channel. Thankfully with go's channels and goroutines being performant the read / write remained incredibly smooth once handled appropriately.

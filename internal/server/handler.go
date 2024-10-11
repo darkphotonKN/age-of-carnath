@@ -27,17 +27,15 @@ func (s *MultiplayerServer) HandleMatchConn(c *gin.Context) {
 		return
 	}
 
-	// add player with a unique id to list of connections with their unique ws connection
-	// as a key
-	newPlayerId := uuid.New()
-	s.clientConns[conn] = Player{id: newPlayerId, name: "guest"}
-
 	// handle each connected client's messages concurrently
 	go s.ServeConnectedPlayer(conn)
 }
 
 /**
 * Serves each individual connected player.
+* NOTE: Gorilla Websocket package only allows ONE CONCURRENT WRITER
+* at a time, meaning its best to utilize *unbuffered* channels to prevent
+* a single client from locking the entire server.
 **/
 func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 	defer func() {
@@ -48,8 +46,16 @@ func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 	fmt.Printf("Starting listener for user %v\n", s.clientConns[conn])
 	for {
 		_, message, err := conn.ReadMessage()
+
 		if err != nil {
-			break
+			// -- clean up connection --
+
+			// handle error - if error is of type thats an unknown error
+			// that matches the two types listed, we close return the loop and
+			// close it immediately (via the defer)
+			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
+				break
+			}
 		}
 
 		// decode message to pre-defined json structure
@@ -64,8 +70,34 @@ func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 
 		fmt.Println("Received message as string:", string(message))
 
+		clientPackage := ClientPackage{GameMessage: decodedMsg, Conn: conn}
+
 		// send message to MessageHub for handling based on type
-		s.serverChan <- decodedMsg
+		s.serverChan <- clientPackage
+	}
+}
+
+/**
+* Adds a player to the list of client connections.
+**/
+func (s *MultiplayerServer) addClient(conn *websocket.Conn, client Player) {
+	// lock and unlock to prevent race conditions
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.clientConns[conn] = client
+}
+
+/**
+* Removes a player from the list of client connections.
+**/
+func (s *MultiplayerServer) removeClient(conn *websocket.Conn) {
+	// lock and unlock to prevent race conditions
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if _, ok := s.clientConns[conn]; ok {
+		conn.Close()
+		delete(s.clientConns, conn)
 	}
 }
 
