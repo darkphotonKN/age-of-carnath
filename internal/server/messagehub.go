@@ -17,6 +17,8 @@ func (s *MultiplayerServer) MessageHub() {
 		case clientPackage := <-s.serverChan:
 			fmt.Printf("Client Package received: %+v\n\n", clientPackage)
 
+			// NOTE: parses payload to a specific type based on the action type
+			// e.g. when payload is "find_match" the payload is converted from interface{} -> Player
 			err := clientPackage.GameMessage.ParsePayload()
 
 			if err != nil {
