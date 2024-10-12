@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { EB_Garamond } from "next/font/google";
+import NavBar from "@/components/Nav";
 
 const fontFamily = EB_Garamond({
   weight: ["400", "500", "700"],
@@ -25,6 +26,7 @@ export default function RootLayout({
           fontFamily.className + " bg-customGray p-[50px] h-screen min-h-screen"
         }
       >
+        <NavBar />
         <h1 className="text-4xl font-medium text-center">Age of Carnath</h1>
         {children}
       </body>
