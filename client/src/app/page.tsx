@@ -1,43 +1,33 @@
 "use client";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/Button";
-import { GameAction } from "@/constants/enums";
-import { GamePayload, Player } from "@/game/types";
-import useWebSocketServer from "@/hooks/useWebsocketServer";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useWebsocketStore } from "@/stores/websocketStore";
 
 export default function MainMenu() {
   const router = useRouter();
 
-  const [connect, setConnect] = useState(false);
+  // connect to websocket state store
+  const { ws, setupWebSocket, startMatchmaking } = useWebsocketStore();
 
-  // connect to websocket
-  const { ws } = useWebSocketServer({
-    connectToWebSocket: connect,
-    playerId: "1",
-    gameId: "1",
-  });
-
-  // -- Handle Finding a Match --
+  // -- Handle Finding a Match function and useEffect --
   function handleFindMatch() {
-    setConnect(true);
+    setupWebSocket();
   }
 
   useEffect(() => {
     if (ws && ws.readyState === WebSocket.OPEN) {
-      const messagePayload: GamePayload<Player> = {
-        action: GameAction.FIND_MATCH,
-        payload: {
-          id: uuidv4(),
-          name: "test first ever player",
-        },
-      };
-      // start matchmaking
-      ws.send(JSON.stringify(messagePayload));
-
       // route to the match page
       router.push("/game");
+
+      // init matchmaking
+      const player = {
+        id: uuidv4(),
+        name: "test first ever player",
+      };
+
+      startMatchmaking(player);
     }
   }, [ws, ws?.readyState]);
 
