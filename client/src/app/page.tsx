@@ -9,7 +9,7 @@ export default function MainMenu() {
   const router = useRouter();
 
   // for handling init connection
-  const [initFindMatch, setFindMatch] = useState(false);
+  const [initFindMatch, setInitFindMatch] = useState(false);
 
   // connect to websocket state store
   const { ws, setupWebSocket, startMatchmaking } = useWebsocketStore();
@@ -17,7 +17,7 @@ export default function MainMenu() {
   // -- Handle Finding a Match function and useEffect --
   function handleInitFindMatch() {
     setupWebSocket();
-    setFindMatch(true);
+    setInitFindMatch(true);
   }
 
   useEffect(() => {

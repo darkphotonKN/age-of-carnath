@@ -14,7 +14,7 @@ import (
 // since this logic is tighly linked with the primary websocket server of the application.
 
 /**
-* Handles player searching for a match (incoming connection), upgrades them to webscoket connections,
+* Handles player searching for a match (incoming connection), upgrades them to websocket connections,
 * and passes them off to individual goroutines to be handled concurrently.
 **/
 func (s *MultiplayerServer) HandleMatchConn(c *gin.Context) {
