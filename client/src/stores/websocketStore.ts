@@ -10,6 +10,7 @@ type WebSocketState = {
   setConnectionStatus: (status: boolean) => void;
   sendMessage: <T>(payload: GamePayload<T>) => void;
   startMatchmaking: (player: Player) => void;
+  closeConnection: () => void;
 };
 
 /**
@@ -17,7 +18,6 @@ type WebSocketState = {
  * This store keeps track of the WebSocket instance, its connection state,
  * and provides methods to manage the connection and send messages.
  **/
-
 export const useWebsocketStore = create<WebSocketState>((set, get) => ({
   // -- State Variables --
   ws: null,
@@ -34,11 +34,14 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
    * Initializes the WebSocket instance
    **/
   setupWebSocket: () => {
+    // prevent re-setup
+    if (get().ws) return;
+
     const socket = new WebSocket(`ws://localhost:4111/ws`);
 
     socket.onopen = () => {
       console.log("Connected to WebSocket server!");
-      set({ ws: socket });
+      get().setWebSocket(socket);
     };
 
     socket.onerror = (error) => {
@@ -95,5 +98,17 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
     };
 
     get().sendMessage(payload);
+  },
+
+  /**
+   * Performs a clean up for the websocket connection and the current websocket instance.
+   **/
+  closeConnection: () => {
+    console.log("cleaning up");
+    // close connetion
+    get().ws?.close();
+
+    // reset ws instance
+    set({ ws: null });
   },
 }));
