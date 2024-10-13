@@ -97,6 +97,7 @@ func (s *MultiplayerServer) removeClient(conn *websocket.Conn) {
 
 	if client, ok := s.clientConns[conn]; ok {
 		conn.Close()
+
 		// remove them from the match and stops the match
 		s.StopMatch(client.ID)
 

@@ -13,6 +13,7 @@ func (s *MultiplayerServer) MessageHub() {
 	for {
 		fmt.Printf("Current client connections in session: %+v\n\n", s.clientConns)
 		fmt.Printf("Current ongoing matches %+v\n\n", s.matches)
+
 		select {
 		case clientPackage := <-s.serverChan:
 			fmt.Printf("Client Package received: %+v\n\n", clientPackage)
