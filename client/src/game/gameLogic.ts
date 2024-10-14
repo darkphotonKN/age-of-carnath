@@ -222,3 +222,14 @@ function iterateColumns(
     return;
   }
 }
+
+/**
+ * Clears all highlighting for the GridState.
+ **/
+export function clearGridStateHighlighting(gridState: GridState) {
+  gridState.forEach((gridRow) => {
+    gridRow.forEach((gridBlock) => {
+      gridBlock.highlight = false;
+    });
+  });
+}

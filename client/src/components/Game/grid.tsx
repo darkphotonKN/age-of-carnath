@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import GameBlock from "./Block";
 import { GridState } from "@/game/types";
 import { ContentType } from "@/constants/enums";
-import { highlightPath } from "@/game/gameLogic";
+import { clearGridStateHighlighting, highlightPath } from "@/game/gameLogic";
 
 /**
  * GameGrid Component
@@ -40,8 +40,6 @@ function GameGrid() {
     // load server grid state into local grid state
   }, []);
 
-  console.log("Mock GridState:", gridState);
-
   function highlightPathPreview(rowIndex: number, colIndex: number) {
     if (!gridState) return;
 
@@ -62,14 +60,6 @@ function GameGrid() {
     highlightPath(colIndex, rowIndex, testPlayer.position, newGridState);
 
     setGridState(newGridState);
-  }
-
-  function clearGridStateHighlighting(gridState: GridState) {
-    gridState.forEach((gridRow) => {
-      gridRow.forEach((gridBlock) => {
-        gridBlock.highlight = false;
-      });
-    });
   }
 
   // TODO: use grid from game server
