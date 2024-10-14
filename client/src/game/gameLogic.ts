@@ -24,35 +24,33 @@ export function highlightPath(
   y2: number,
   { x: x1, y: y1 }: Position,
   gridState: GridState,
-): Position[] {
-  if (x2 > gridState.length || y2 >= gridState[0].length) {
+) {
+  if (x2 > gridState[0].length || y2 >= gridState.length) {
     console.error("Index passed for x or y is out of bounds.");
     return [];
   }
 
-  const coordinates: Position[] = [];
-
   // always start with default
-  coordinates.push({ x: x1, y: y1 });
+  // coordinates.push({ x: x1, y: y1 });
+  gridState[y1][x1].highlight = true;
 
   // 1 -- check if already at target --
   if (x1 == x2 && y1 == y2) {
-    coordinates.push({ x: x2, y: y2 });
-    return coordinates;
+    return;
   }
 
   // 2 -- check if same row or col --
 
   // --- same column ---
   if (x1 === x2) {
-    iterateRows(x2, y1, y2, coordinates);
-    return coordinates;
+    iterateRows(x2, y1, y2, gridState);
+    return;
   }
 
   // --- same row ---
   if (y1 == y2) {
-    iterateColumns(y2, x1, x2, coordinates);
-    return coordinates;
+    iterateColumns(y2, x1, x2, gridState);
+    return;
   }
 
   // 3 -- traverse diagonally --
@@ -74,19 +72,20 @@ export function highlightPath(
       y3++;
 
       // add current coordinate
-      coordinates.push({ x: x3, y: y3 });
+      // coordinates.push({ x: x3, y: y3 });
+      gridState[y3][x3].highlight = true;
 
       // check if on the same row or col as target
       if (y3 === y2) {
         // add remaining coordinates
-        iterateColumns(y3, x3, x2, coordinates);
-        return coordinates;
+        iterateColumns(y3, x3, x2, gridState);
+        return;
       }
 
       if (x3 === x2) {
         // add remaining coordinates
-        iterateRows(x3, y3, y2, coordinates);
-        return coordinates;
+        iterateRows(x3, y3, y2, gridState);
+        return;
       }
     } while (y3 < y2 && x3 < x2);
   }
@@ -99,19 +98,20 @@ export function highlightPath(
       y3++;
 
       // add current coordinate
-      coordinates.push({ x: x3, y: y3 });
+      // coordinates.push({ x: x3, y: y3 });
+      gridState[y3][x3].highlight = true;
 
       // check if on the same row or col as target
       if (y3 === y2) {
         // add remaining coordinates
-        iterateColumns(y3, x3, x2, coordinates);
-        return coordinates;
+        iterateColumns(y3, x3, x2, gridState);
+        return;
       }
 
       if (x3 === x2) {
         // add remaining coordinates
-        iterateRows(x3, y3, y2, coordinates);
-        return coordinates;
+        iterateRows(x3, y3, y2, gridState);
+        return;
       }
     } while (y3 < y2 && x3 > x2);
   }
@@ -124,19 +124,20 @@ export function highlightPath(
       y3--;
 
       // add current coordinate
-      coordinates.push({ x: x3, y: y3 });
+      // coordinates.push({ x: x3, y: y3 });
+      gridState[y3][x3].highlight = true;
 
       // check if on the same row or col as target
       if (y3 === y2) {
         // add remaining coordinates
-        iterateColumns(y3, x3, x2, coordinates);
-        return coordinates;
+        iterateColumns(y3, x3, x2, gridState);
+        return;
       }
 
       if (x3 === x2) {
         // add remaining coordinates
-        iterateRows(x3, y3, y2, coordinates);
-        return coordinates;
+        iterateRows(x3, y3, y2, gridState);
+        return;
       }
     } while (y3 > y2 && x3 > x2);
   }
@@ -149,23 +150,24 @@ export function highlightPath(
       y3--;
 
       // add current coordinate
-      coordinates.push({ x: x3, y: y3 });
+      // coordinates.push({ x: x3, y: y3 });
+      gridState[y3][x3].highlight = true;
 
       // check if on the same row or col as target
       if (y3 === y2) {
         // add remaining coordinates
-        iterateColumns(y3, x3, x2, coordinates);
-        return coordinates;
+        iterateColumns(y3, x3, x2, gridState);
+        return;
       }
 
       if (x3 === x2) {
         // add remaining coordinates
-        iterateRows(x3, y3, y2, coordinates);
-        return coordinates;
+        iterateRows(x3, y3, y2, gridState);
+        return;
       }
     } while (y3 > y2 && x3 < x2);
   }
-  return coordinates;
+  return;
 }
 
 // updates row coordinates via pass by reference
@@ -173,20 +175,22 @@ function iterateRows(
   x: number,
   y1: number,
   y2: number,
-  coordinates: Position[],
+  coordinates: GridState,
 ) {
   const direction = y1 < y2 ? YDirection.DOWN : YDirection.UP;
   // --- same column ---
   // iterate towards row
   if (direction === YDirection.DOWN) {
-    for (let yi = y1 + 1; yi < y2; yi++) {
-      coordinates.push({ y: yi, x });
+    for (let yi = y1 + 1; yi <= y2; yi++) {
+      // coordinates.push({ y: yi, x });
+      coordinates[yi][x].highlight = true;
     }
     return;
   }
   if (direction === YDirection.UP) {
-    for (let yi = y1 - 1; yi > y2; yi--) {
-      coordinates.push({ y: yi, x });
+    for (let yi = y1 - 1; yi >= y2; yi--) {
+      // coordinates.push({ y: yi, x });
+      coordinates[yi][x].highlight = true;
     }
     return;
   }
@@ -197,21 +201,23 @@ function iterateColumns(
   y: number,
   x1: number,
   x2: number,
-  coordinates: Position[],
+  coordinates: GridState,
 ) {
   const direction = x1 < x2 ? XDirection.RIGHT : XDirection.LEFT;
 
   // --- same row ---
   // iterate towards col
   if (direction === XDirection.RIGHT) {
-    for (let xi = x1 + 1; xi < x2; xi++) {
-      coordinates.push({ y, x: xi });
+    for (let xi = x1 + 1; xi <= x2; xi++) {
+      // coordinates.push({ y, x: xi });
+      coordinates[y][xi].highlight = true;
     }
     return;
   }
   if (direction === XDirection.LEFT) {
-    for (let xi = x1 - 1; xi > x2; xi--) {
-      coordinates.push({ y, x: xi });
+    for (let xi = x1 - 1; xi >= x2; xi--) {
+      // coordinates.push({ y, x: xi });
+      coordinates[y][xi].highlight = true;
     }
     return;
   }

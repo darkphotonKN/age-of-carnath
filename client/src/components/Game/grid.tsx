@@ -15,7 +15,6 @@ import { highlightPath } from "@/game/gameLogic";
 function GameGrid() {
   const [gridState, setGridState] = useState<GridState>();
 
-  // NOTE: Testing - Remove after test
   useEffect(() => {}, [gridState]);
 
   useEffect(() => {
@@ -38,15 +37,18 @@ function GameGrid() {
     }
 
     setGridState(mockGrid);
-
     // load server grid state into local grid state
   }, []);
 
   console.log("Mock GridState:", gridState);
 
-  function highlightAction(rowIndex: number, colIndex: number) {
-    console.log(`Highlighting index: x (${rowIndex}) y (${colIndex})`);
+  function highlightPathPreview(rowIndex: number, colIndex: number) {
     if (!gridState) return;
+
+    const newGridState = [...gridState];
+
+    // clear all old highlight state
+    clearGridStateHighlighting(newGridState);
 
     const testPlayer = {
       name: "Test player",
@@ -55,23 +57,19 @@ function GameGrid() {
         y: 0,
       },
     };
-    if (!gridState) return;
-    const newGridState = [...gridState];
-    const coords = highlightPath(
-      colIndex,
-      rowIndex,
-      testPlayer.position,
-      newGridState,
-    );
-    newGridState?.forEach((row) => {
-      row.forEach((item) => {
-        if (item.position.x == colIndex && item.position.y == rowIndex) {
-          item.highlight = true;
-        }
-      });
-    });
+
+    // highlights preview of possible paths
+    highlightPath(colIndex, rowIndex, testPlayer.position, newGridState);
 
     setGridState(newGridState);
+  }
+
+  function clearGridStateHighlighting(gridState: GridState) {
+    gridState.forEach((gridRow) => {
+      gridRow.forEach((gridBlock) => {
+        gridBlock.highlight = false;
+      });
+    });
   }
 
   // TODO: use grid from game server
@@ -84,7 +82,7 @@ function GameGrid() {
               <GameBlock
                 key={rowIndex + " " + colIndex}
                 highlight={gridBlock.highlight}
-                onMouseEnter={() => highlightAction(rowIndex, colIndex)}
+                onMouseEnter={() => highlightPathPreview(rowIndex, colIndex)}
               />
             ))}
           </div>

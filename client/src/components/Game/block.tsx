@@ -4,10 +4,11 @@ type GameBlockProps = {
 };
 
 function GameBlock({ highlight, onMouseEnter }: GameBlockProps) {
-  console.log("highlight:", highlight);
   return (
     <div
-      className={`border border-customBorderGray w-[35px] h-[35px] ${highlight ? "bg-pink-500" : ""}`}
+      // TODO: Remove after testing
+      className={`border border-customBorderGray w-[35px] h-[35px] ${highlight ? "bg-customBorderGray" : ""}`}
+      // className={`w-[35px] h-[35px] ${highlight ? "bg-customBorderGray" : ""}`}
       onMouseEnter={onMouseEnter}
     ></div>
   );
