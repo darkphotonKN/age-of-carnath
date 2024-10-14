@@ -16,7 +16,7 @@ The client-side interface is developed in typescript reactjs with the nextjs fra
 
 - Game loop: Players take turns in combat, with actions communicated through WebSocket messages.
 
-- 1v1 player management and matchmaking: The server supports 1v1 matches., with both players connecting via WebSocket and Matches between two players are handled and creates a unique instance between two players when a match is found, whereby their actions are handled and broadcast to each other.
+- 1v1 player management and matchmaking: The server supports 1v1 matches, with both players connecting via WebSocket connections. The matches between two players are handled by creating a unique instance between two players when a match is found, whereby their actions are handled and broadcast to each other.
 
 ### Game Server
 
@@ -24,8 +24,30 @@ The protocol chosen was Websockets over TCP for the ease of use. However, there 
 
 #### Using Unbuffered Channels
 
+k
 Since Gorilla Websocket was the most reliable websocket package in Go at the time of writing this project, it was used to create the entire websocket server for players to find matches and for the game's live action handling and tracking.
 
 There was a big design decision to use **unbuffered** channels as a result, since there are analysis that show that the package only allows _one concurrent client to write to the server at once_. This means one client could potentially lock the entire server with message spam if unbuffered channels weren't used. Overall this prevented a huge number of writes to the server at the same time.
 
 A simple read / write loop for websockets therefore turned into a slighty more complex read / write via websocket and with a communication layer via an unbuffered channel. Thankfully with go's channels and goroutines being performant the read / write remained incredibly smooth once handled appropriately.
+
+### Client Game State & Logic
+
+The frontend client was coded in reactjs, using a mixture of zustand for global statemanagement and react's standard state for game interactions.
+
+#### GameGrid Component
+
+The core component for rendering the game's visuals and controlling the syncing between of game state between client and server.
+
+#### Game State Handling
+
+The game's state is managed by both the game server providing infromation over the persistent websocket connection as well as react's local component state and zustand providing global state.
+
+The local state inside the GameGrid component is used to render things for temporary visual purposes, such as highlighting the game view with actions or seeing temporary information.
+
+The global state uses zustand over redux for reduced boilerplate and simplicity of code. There is a single useWebsocketStore to interact with the global state source. This source provides two things:
+
+- A centralized access to the websocket instance connection for the application.
+- A synced game-state that originated from the websocket server that multiple components require.
+
+This global source is used for controlling game interactions and providing real-time updates for each match.

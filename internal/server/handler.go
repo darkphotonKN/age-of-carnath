@@ -125,6 +125,7 @@ func (s *MultiplayerServer) StopMatch(playerId uuid.UUID) error {
 
 /**
 * Helps find a match for the player.
+* TODO: Add matchmaking algorithm.
 **/
 func (s *MultiplayerServer) findMatch(player Player) uuid.UUID {
 	fmt.Println("Finding match...")

@@ -21,7 +21,8 @@ function GameOptions() {
   }
 
   return (
-    <div>
+    <div className="flex justify-center mt-5 gap-3">
+      <Button variant="default">Settings</Button>
       <Button variant="default" onClick={handleCloseConnection}>
         Exit Match
       </Button>

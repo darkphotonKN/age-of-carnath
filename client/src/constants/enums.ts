@@ -6,3 +6,10 @@ export const GameAction = {
   ATTACK: "attack",
 } as const;
 export type GameActionEnum = EnumValue<typeof GameAction>;
+
+export const ContentType = {
+  EMPTY: "emtpy",
+  PLAYER: "player",
+  ITEM: "item",
+} as const;
+export type ContentTypeEnum = EnumValue<typeof ContentType>;
