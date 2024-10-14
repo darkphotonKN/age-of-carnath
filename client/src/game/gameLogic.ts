@@ -91,6 +91,80 @@ export function highlightPath(
     } while (y3 < y2 && x3 < x2);
   }
 
+  // Target: BOTTOM - LEFT
+  if (yDirection === YDirection.DOWN && xDirection === XDirection.LEFT) {
+    do {
+      // iterate diagonally
+      x3--;
+      y3++;
+
+      // add current coordinate
+      coordinates.push({ x: x3, y: y3 });
+
+      // check if on the same row or col as target
+      if (y3 === y2) {
+        // add remaining coordinates
+        iterateColumns(y3, x3, x2, coordinates);
+        return coordinates;
+      }
+
+      if (x3 === x2) {
+        // add remaining coordinates
+        iterateRows(x3, y3, y2, coordinates);
+        return coordinates;
+      }
+    } while (y3 < y2 && x3 > x2);
+  }
+
+  // Target: TOP - LEFT
+  if (yDirection === YDirection.UP && xDirection === XDirection.LEFT) {
+    do {
+      // iterate diagonally
+      x3--;
+      y3--;
+
+      // add current coordinate
+      coordinates.push({ x: x3, y: y3 });
+
+      // check if on the same row or col as target
+      if (y3 === y2) {
+        // add remaining coordinates
+        iterateColumns(y3, x3, x2, coordinates);
+        return coordinates;
+      }
+
+      if (x3 === x2) {
+        // add remaining coordinates
+        iterateRows(x3, y3, y2, coordinates);
+        return coordinates;
+      }
+    } while (y3 > y2 && x3 > x2);
+  }
+
+  // Target: TOP - RIGHT
+  if (yDirection === YDirection.UP && xDirection === XDirection.RIGHT) {
+    do {
+      // iterate diagonally
+      x3++;
+      y3--;
+
+      // add current coordinate
+      coordinates.push({ x: x3, y: y3 });
+
+      // check if on the same row or col as target
+      if (y3 === y2) {
+        // add remaining coordinates
+        iterateColumns(y3, x3, x2, coordinates);
+        return coordinates;
+      }
+
+      if (x3 === x2) {
+        // add remaining coordinates
+        iterateRows(x3, y3, y2, coordinates);
+        return coordinates;
+      }
+    } while (y3 > y2 && x3 < x2);
+  }
   return coordinates;
 }
 

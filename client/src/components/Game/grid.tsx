@@ -16,18 +16,7 @@ function GameGrid() {
   const [gridState, setGridState] = useState<GridState>();
 
   // NOTE: Testing - Remove after test
-  useEffect(() => {
-    const testPlayer = {
-      name: "Test player",
-      position: {
-        x: 17,
-        y: 0,
-      },
-    };
-    if (!gridState) return;
-    const coords = highlightPath(3, 0, testPlayer.position, gridState);
-    console.log("[@highlightPath]: Coords:", coords);
-  }, [gridState]);
+  useEffect(() => {}, [gridState]);
 
   useEffect(() => {
     const COL_SIZE = 24;
@@ -56,10 +45,24 @@ function GameGrid() {
   console.log("Mock GridState:", gridState);
 
   function highlightAction(rowIndex: number, colIndex: number) {
-    if (!gridState) return;
     console.log(`Highlighting index: x (${rowIndex}) y (${colIndex})`);
-    const newGridState = [...gridState];
+    if (!gridState) return;
 
+    const testPlayer = {
+      name: "Test player",
+      position: {
+        x: 0,
+        y: 0,
+      },
+    };
+    if (!gridState) return;
+    const newGridState = [...gridState];
+    const coords = highlightPath(
+      colIndex,
+      rowIndex,
+      testPlayer.position,
+      newGridState,
+    );
     newGridState?.forEach((row) => {
       row.forEach((item) => {
         if (item.position.x == colIndex && item.position.y == rowIndex) {
