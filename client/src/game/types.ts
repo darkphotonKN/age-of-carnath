@@ -19,6 +19,7 @@ export type Position = {
 export type GridBlock = {
   contentType: ContentTypeEnum;
   position: Position;
+  highlight?: boolean;
 };
 
 export type GridState = GridBlock[][];

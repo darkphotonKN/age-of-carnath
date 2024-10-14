@@ -13,3 +13,15 @@ export const ContentType = {
   ITEM: "item",
 } as const;
 export type ContentTypeEnum = EnumValue<typeof ContentType>;
+
+export const YDirection = {
+  UP: "up",
+  DOWN: "down",
+} as const;
+export type YDirectionEnum = EnumValue<typeof YDirection>;
+
+export const XDirection = {
+  LEFT: "left",
+  RIGHT: "right",
+} as const;
+export type XDirectionEnum = EnumValue<typeof XDirection>;

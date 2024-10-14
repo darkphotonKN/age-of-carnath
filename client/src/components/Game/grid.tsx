@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import GameBlock from "./Block";
 import { GridState } from "@/game/types";
 import { ContentType } from "@/constants/enums";
+import { highlightPath } from "@/game/gameLogic";
 
 /**
  * GameGrid Component
@@ -13,6 +14,20 @@ import { ContentType } from "@/constants/enums";
  **/
 function GameGrid() {
   const [gridState, setGridState] = useState<GridState>();
+
+  // NOTE: Testing - Remove after test
+  useEffect(() => {
+    const testPlayer = {
+      name: "Test player",
+      position: {
+        x: 17,
+        y: 0,
+      },
+    };
+    if (!gridState) return;
+    const coords = highlightPath(3, 0, testPlayer.position, gridState);
+    console.log("[@highlightPath]: Coords:", coords);
+  }, [gridState]);
 
   useEffect(() => {
     const COL_SIZE = 24;
@@ -41,7 +56,19 @@ function GameGrid() {
   console.log("Mock GridState:", gridState);
 
   function highlightAction(rowIndex: number, colIndex: number) {
+    if (!gridState) return;
     console.log(`Highlighting index: x (${rowIndex}) y (${colIndex})`);
+    const newGridState = [...gridState];
+
+    newGridState?.forEach((row) => {
+      row.forEach((item) => {
+        if (item.position.x == colIndex && item.position.y == rowIndex) {
+          item.highlight = true;
+        }
+      });
+    });
+
+    setGridState(newGridState);
   }
 
   // TODO: use grid from game server
@@ -53,6 +80,7 @@ function GameGrid() {
             {gridState?.[rowIndex].map((gridBlock, colIndex) => (
               <GameBlock
                 key={rowIndex + " " + colIndex}
+                highlight={gridBlock.highlight}
                 onMouseEnter={() => highlightAction(rowIndex, colIndex)}
               />
             ))}
