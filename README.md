@@ -24,7 +24,6 @@ The protocol chosen was Websockets over TCP for the ease of use. However, there 
 
 #### Using Unbuffered Channels
 
-k
 Since Gorilla Websocket was the most reliable websocket package in Go at the time of writing this project, it was used to create the entire websocket server for players to find matches and for the game's live action handling and tracking.
 
 There was a big design decision to use **unbuffered** channels as a result, since there are analysis that show that the package only allows _one concurrent client to write to the server at once_. This means one client could potentially lock the entire server with message spam if unbuffered channels weren't used. Overall this prevented a huge number of writes to the server at the same time.
