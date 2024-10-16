@@ -1,17 +1,22 @@
 package game
 
 import (
-	"github.com/darkphotonKN/age-of-carnath/internal/server"
+	"github.com/darkphotonKN/age-of-carnath/internal/models"
 	"github.com/google/uuid"
 )
 
 /**
-* Holds all grid and game information.
-* Uses DI for server access (via pointer).
+* Holds all grid and game information for a **single** match.
 **/
 type Game struct {
-	server    *server.MultiplayerServer
+	// Game unique identifier. NOTE: Currently matches the map key for server matches.
+	ID uuid.UUID
+
+	// holds all the game's grid information
 	GridState GridState
+
+	// contains the match's players. NOTE: (max length 2)
+	Players []models.Player
 }
 
 /**
@@ -43,7 +48,7 @@ type Item struct {
 }
 
 type Content struct {
-	Player *server.Player `json:"player,omitempty"`
+	Player *models.Player `json:"player,omitempty"`
 	Item   *Item          `json:"item,omitempty"`
 }
 
@@ -63,11 +68,10 @@ type GridBlock struct {
 **/
 type GridState [][]GridBlock
 
-func NewGame(server *server.MultiplayerServer, gridRows uint8, gridCols uint8) *Game {
+func NewGame(gridRows uint8, gridCols uint8) *Game {
 	newGrid := initializeGrid(gridRows, gridCols)
 
 	return &Game{
-		server:    server,
 		GridState: newGrid,
 	}
 }

@@ -2,6 +2,8 @@ package server
 
 import (
 	"fmt"
+
+	"github.com/darkphotonKN/age-of-carnath/internal/models"
 )
 
 /**
@@ -33,7 +35,7 @@ func (s *MultiplayerServer) MessageHub() {
 				fmt.Println("Inside 'find match' case, payload:", clientPackage.GameMessage.Payload)
 
 				// assert Payload type specific to gameMessage.Action == "find_match", which is Player
-				player, ok := clientPackage.GameMessage.Payload.(Player)
+				player, ok := clientPackage.GameMessage.Payload.(models.Player)
 
 				if !ok {
 					fmt.Printf("Error attempting to assert player from payload.\n")

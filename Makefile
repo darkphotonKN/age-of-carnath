@@ -1,5 +1,3 @@
-
-# Lets "make" always run test targets
 .PHONY: test 
 	
 build:
@@ -9,14 +7,7 @@ run: build
 	@./bin/game-server
 
 test:
-	@go test ./...
+	@go test ./... --cover
 
 
 
-	
-# build:
-# 	 @go build -o bin/starlight-cargo ./cmd/app/
-# 	
-# run: build
-# 	@./bin/starlight-cargo
-#

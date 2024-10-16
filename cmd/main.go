@@ -12,6 +12,7 @@ func main() {
 	port := ":4111"
 	server := server.NewMultiplayerServer(port)
 
+	// init messagehub concurrently
 	go server.MessageHub()
 
 	// routes setup

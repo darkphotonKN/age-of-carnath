@@ -5,10 +5,14 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/darkphotonKN/age-of-carnath/internal/game"
+	"github.com/darkphotonKN/age-of-carnath/internal/models"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
+
+// -- Core Handler --
 
 // NOTE: maintain tight coupling here unlike other APIs with handler - service - repository pattern
 // since this logic is tighly linked with the primary websocket server of the application.
@@ -30,6 +34,8 @@ func (s *MultiplayerServer) HandleMatchConn(c *gin.Context) {
 	// handle each connected client's messages concurrently
 	go s.ServeConnectedPlayer(conn)
 }
+
+// -- Primary Methods --
 
 /**
 * Serves each individual connected player.
@@ -60,7 +66,7 @@ func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 			break
 		}
 
-		// decode message to pre-defined json structure
+		// decode message to pre-defined json structure "GameMessage"
 		var decodedMsg GameMessage
 
 		err = json.Unmarshal(message, &decodedMsg)
@@ -72,7 +78,7 @@ func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 
 		clientPackage := ClientPackage{GameMessage: decodedMsg, Conn: conn}
 
-		// send message to MessageHub for handling based on type
+		// Send message to MessageHub via an *unbuffered channel* for handling based on type.
 		s.serverChan <- clientPackage
 	}
 }
@@ -80,7 +86,7 @@ func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 /**
 * Adds a player to the list of client connections.
 **/
-func (s *MultiplayerServer) addClient(conn *websocket.Conn, client Player) {
+func (s *MultiplayerServer) addClient(conn *websocket.Conn, client models.Player) {
 	// lock and unlock to prevent race conditions
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -111,8 +117,8 @@ func (s *MultiplayerServer) removeClient(conn *websocket.Conn) {
 **/
 func (s *MultiplayerServer) StopMatch(playerId uuid.UUID) error {
 	// search for player in a match
-	for matchIndex, players := range s.matches {
-		for _, player := range players {
+	for matchIndex, game := range s.matches {
+		for _, player := range game.Players {
 			if player.ID == playerId {
 				// stop and remove match
 				delete(s.matches, matchIndex)
@@ -125,13 +131,15 @@ func (s *MultiplayerServer) StopMatch(playerId uuid.UUID) error {
 
 /**
 * Helps find a match for the player.
-* TODO: Add matchmaking algorithm.
+* TODO: For v1.1: Add matchmaking algorithm.
 **/
-func (s *MultiplayerServer) findMatch(player Player) uuid.UUID {
+func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 	fmt.Println("Finding match...")
 
 	// loop through current matches and find an opponent still waiting
-	for matchId, match := range s.matches {
+	for matchId, game := range s.matches {
+		match := game.Players
+
 		// check length of match to know if its full
 		var matchFull bool = false
 		fmt.Println("Length of match:", len(match))
@@ -141,20 +149,37 @@ func (s *MultiplayerServer) findMatch(player Player) uuid.UUID {
 
 		// join match if not full
 		if !matchFull {
-			s.matches[matchId] = append(s.matches[matchId], player)
+			s.matches[matchId].Players = append(s.matches[matchId].Players, player)
+
 			// end search
 			return matchId
 		}
 	}
 
 	// iteration over, meaning all matches are full, create a new one
-	newMatch := []Player{player}
+	newPlayers := []models.Player{player}
 
 	newMatchUuid := uuid.New()
-	s.matches[newMatchUuid] = newMatch
+
+	// initalize a game
+	// s.initializeGame(matchId)
+
+	s.matches[newMatchUuid] = &game.Game{
+		Players: newPlayers,
+	}
 
 	return newMatchUuid
 }
+
+/**
+* Initalizes a game with the Game struct and methods.
+**/
+func (s *MultiplayerServer) initializeGame(matchId uuid.UUID) {
+	// newGame := game.NewGame(30, 50)
+
+}
+
+// --- Helpers ---
 
 type PlayerIdString struct {
 	id   string
@@ -163,24 +188,24 @@ type PlayerIdString struct {
 
 // For pretty-fying matches for easier testing by mapping each id from a UUID
 // to a string
-func MapIdStringMatches(matches map[uuid.UUID][]Player) map[string][]PlayerIdString {
+func MapIdStringMatches(matches map[uuid.UUID]*game.Game) map[string][]PlayerIdString {
 	matchesToPrint := make(map[string][]PlayerIdString)
 
 	// map over and convert byte slice keys to id strings
 	for index := range matches {
 		var player1, player2 PlayerIdString
 
-		if len(matches[index]) > 0 {
+		if len(matches[index].Players) > 0 {
 			player1 = PlayerIdString{
-				id:   matches[index][0].ID.String(),
-				name: matches[index][0].Name,
+				id:   matches[index].Players[0].ID.String(),
+				name: matches[index].Players[0].Name,
 			}
 		}
 
-		if len(matches[index]) > 1 {
+		if len(matches[index].Players) > 1 {
 			player2 = PlayerIdString{
-				id:   matches[index][1].ID.String(),
-				name: matches[index][1].Name,
+				id:   matches[index].Players[1].ID.String(),
+				name: matches[index].Players[1].Name,
 			}
 		}
 

@@ -4,14 +4,11 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/darkphotonKN/age-of-carnath/internal/game"
+	"github.com/darkphotonKN/age-of-carnath/internal/models"
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
 )
-
-type Player struct {
-	ID   uuid.UUID `json:"id"`
-	Name string    `json:"name"`
-}
 
 const (
 	player_limit = 5000
@@ -29,12 +26,18 @@ type ClientPackage struct {
 type MultiplayerServer struct {
 	ListenAddr string
 	upgrader   websocket.Upgrader
-	// TODO: Update this to database struct
-	players     map[string]Player          // all players that can play
-	clientConns map[*websocket.Conn]Player // all currently connected players from all match connections
-	matches     map[uuid.UUID][]Player     // all ongoing matches
-	serverChan  chan ClientPackage
-	mu          sync.Mutex
+
+	// All players. TODO: Update this to use a persistent database.
+	players map[string]models.Player
+
+	// All currently connected players from all on-going match connections
+	clientConns map[*websocket.Conn]models.Player
+
+	// All ongoing matches
+	// NOTE: self-reminder - maintain this as a map for O(1) performance in finding matches
+	matches    map[uuid.UUID]*game.Game
+	serverChan chan ClientPackage
+	mu         sync.Mutex
 }
 
 func NewMultiplayerServer(listenAddr string) *MultiplayerServer {
@@ -48,9 +51,9 @@ func NewMultiplayerServer(listenAddr string) *MultiplayerServer {
 	return &MultiplayerServer{
 		ListenAddr:  listenAddr,
 		upgrader:    upgrader,
-		players:     make(map[string]Player, player_limit), // TODO: update this to persist from DB
-		clientConns: make(map[*websocket.Conn]Player, player_limit),
-		matches:     make(map[uuid.UUID][]Player),
+		players:     make(map[string]models.Player, player_limit),
+		clientConns: make(map[*websocket.Conn]models.Player, player_limit),
+		matches:     make(map[uuid.UUID]*game.Game),
 		serverChan:  make(chan ClientPackage),
 	}
 }

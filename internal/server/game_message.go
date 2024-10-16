@@ -2,12 +2,15 @@ package server
 
 import (
 	"fmt"
+
+	"github.com/darkphotonKN/age-of-carnath/internal/models"
 	"github.com/google/uuid"
 )
 
 /**
 * -- Game Message --
 * The payload for communication between client-server.
+*
 * Handles all the conversion and parsing for the game messages sent from client to
 * the server.
 **/
@@ -60,7 +63,7 @@ func (gm *GameMessage) ParsePayload() error {
 			return fmt.Errorf("Could not parse id into a UUID.")
 		}
 
-		convertedPlayer := Player{
+		convertedPlayer := models.Player{
 			ID:   idUUID,
 			Name: name,
 		}

@@ -1,58 +1,55 @@
 package game
 
 import (
-	"testing"
-
-	"github.com/darkphotonKN/age-of-carnath/internal/server"
 	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 func TestNewGame_GridState(t *testing.T) {
-	server := server.NewMultiplayerServer(":3333")
-	game := NewGame(server, 3, 3)
+	game := NewGame(3, 3)
 
 	expectedGridState := GridState{
 		{
 			{
-				position: Position{x: 0, y: 0},
-				content:  Content{contentType: empty},
+				ContentType: empty,
+				Position:    Position{x: 0, y: 0},
 			},
 			{
-				position: Position{x: 1, y: 0},
-				content:  Content{contentType: empty},
+				ContentType: empty,
+				Position:    Position{x: 1, y: 0},
 			},
 			{
-				position: Position{x: 2, y: 0},
-				content:  Content{contentType: empty},
+				ContentType: empty,
+				Position:    Position{x: 2, y: 0},
 			},
 		},
 		{
 			{
-				position: Position{x: 0, y: 1},
-				content:  Content{contentType: empty},
+				ContentType: empty,
+				Position:    Position{x: 0, y: 1},
 			},
 
 			{
-				position: Position{x: 1, y: 1},
-				content:  Content{contentType: empty},
+				ContentType: empty,
+				Position:    Position{x: 1, y: 1},
 			},
 			{
-				position: Position{x: 2, y: 1},
-				content:  Content{contentType: empty},
+				ContentType: empty,
+				Position:    Position{x: 2, y: 1},
 			},
 		},
 		{
 			{
-				position: Position{x: 0, y: 2},
-				content:  Content{contentType: empty},
+				ContentType: empty,
+				Position:    Position{x: 0, y: 2},
 			},
 			{
-				position: Position{x: 1, y: 2},
-				content:  Content{contentType: empty},
+				ContentType: empty,
+				Position:    Position{x: 1, y: 2},
 			},
 			{
-				position: Position{x: 2, y: 2},
-				content:  Content{contentType: empty},
+				ContentType: empty,
+				Position:    Position{x: 2, y: 2},
 			},
 		},
 	}
