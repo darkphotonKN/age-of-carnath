@@ -1,10 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import GameBlock from "./Block";
-import { GridBlock, GridState, Player, Position } from "@/game/types";
+import { GridState, Player, Position } from "@/game/types";
 import { ContentType } from "@/constants/enums";
 import { clearGridStateHighlighting, highlightPath } from "@/game/gameLogic";
-import Image from "next/image";
+import { TooltipProps } from "../Tooltip";
 
 /**
  * GameGrid Component
@@ -17,6 +17,7 @@ import Image from "next/image";
 function GameGrid() {
   const [gridState, setGridState] = useState<GridState>();
   const [currentPlayer, setCurrentPlayer] = useState<Player>();
+  const [currentTarget, setCurrentTarget] = useState<TooltipProps>();
 
   useEffect(() => {
     const COL_SIZE = 24;
@@ -100,6 +101,9 @@ function GameGrid() {
 
     if (!currentPlayerPos) return;
 
+    // set current target, for Tooltip and target tracking
+    setCurrentTarget({ position: { x: targetX, y: targetY } });
+
     // highlights preview of possible paths
     // NOTE: player position is the current turn player's position
     highlightPath(targetX, targetY, currentPlayerPos, newGridState);
@@ -109,7 +113,7 @@ function GameGrid() {
 
   // TODO: use grid from game server
   return (
-    <div className="mt-5 flex flex-col justify-center items-center">
+    <div className="border border-customBorderGray overflow-hidden mt-5 flex flex-col justify-center items-center">
       {gridState?.map((gridRow, y) => {
         return (
           <div key={y} className="flex">
@@ -119,6 +123,7 @@ function GameGrid() {
                 highlight={gridBlock.highlight}
                 contentType={gridBlock?.contentType}
                 coords={gridBlock.position}
+                tooltipProps={currentTarget}
                 onMouseEnter={() => highlightPathPreview(y, x)}
               />
             ))}
