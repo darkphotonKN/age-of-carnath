@@ -11,6 +11,11 @@ export type Player = {
   name: string;
 };
 
+export type Item = {
+  id: string;
+  label: string;
+};
+
 export type Position = {
   x: number;
   y: number;
@@ -19,6 +24,7 @@ export type Position = {
 export type GridBlock = {
   contentType: ContentTypeEnum;
   position: Position;
+  content?: Player | Item;
   highlight?: boolean;
 };
 

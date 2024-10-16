@@ -30,10 +30,6 @@ export function highlightPath(
     return [];
   }
 
-  // always start with default
-  // coordinates.push({ x: x1, y: y1 });
-  gridState[y1][x1].highlight = true;
-
   // 1 -- check if already at target --
   if (x1 == x2 && y1 == y2) {
     return;

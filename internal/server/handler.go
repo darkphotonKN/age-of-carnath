@@ -148,7 +148,6 @@ func (s *MultiplayerServer) findMatch(player Player) uuid.UUID {
 	}
 
 	// iteration over, meaning all matches are full, create a new one
-
 	newMatch := []Player{player}
 
 	newMatchUuid := uuid.New()

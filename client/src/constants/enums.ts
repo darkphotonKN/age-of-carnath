@@ -8,7 +8,7 @@ export const GameAction = {
 export type GameActionEnum = EnumValue<typeof GameAction>;
 
 export const ContentType = {
-  EMPTY: "emtpy",
+  EMPTY: "empty",
   PLAYER: "player",
   ITEM: "item",
 } as const;

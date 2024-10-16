@@ -1,6 +1,9 @@
 package game
 
-import "github.com/darkphotonKN/age-of-carnath/internal/server"
+import (
+	"github.com/darkphotonKN/age-of-carnath/internal/server"
+	"github.com/google/uuid"
+)
 
 /**
 * Holds all grid and game information.
@@ -33,9 +36,15 @@ const (
 /**
 * The content that can occupy a position on the GridState.
 **/
+
+type Item struct {
+	ID    uuid.UUID `json:"id"`
+	Label string    `json:"label"`
+}
+
 type Content struct {
-	contentType ContentType
-	value       interface{}
+	Player *server.Player `json:"player,omitempty"`
+	Item   *Item          `json:"item,omitempty"`
 }
 
 /**
@@ -44,8 +53,9 @@ type Content struct {
 * Content - the occupying content of the grid.
 **/
 type GridBlock struct {
-	position Position
-	content  Content
+	Position    Position    `json:"position"`
+	ContentType ContentType `json:"contentType"`
+	Content     Content     `json:"content"`
 }
 
 /**
@@ -74,13 +84,11 @@ func initializeGrid(rows uint8, cols uint8) GridState {
 
 		for colIndex := range newGridState[rowIndex] {
 			newGridState[rowIndex][colIndex] = GridBlock{
-				position: Position{
+				Position: Position{
 					x: uint8(colIndex),
 					y: uint8(rowIndex),
 				},
-				content: Content{
-					contentType: empty,
-				},
+				ContentType: empty,
 			}
 		}
 	}
