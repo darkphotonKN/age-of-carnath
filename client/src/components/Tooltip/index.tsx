@@ -7,10 +7,13 @@ export type TooltipProps = {
 function Tooltip({ position }: TooltipProps) {
   const { x, y } = position;
   return (
-    <div className="absolute top-0 left-0 border border-gray-700 w-[50px] h-[50px]">
-      <div>x: {x}</div>
-
-      <div>y: {y}</div>
+    <div className="absolute bottom-[-80px] left-[-70px] z-10 w-[70px] h-[80px] flex justify-center items-center border rounded-sm bg-gray-500 text-white ">
+      <div>
+        <div>move to:</div>
+        <div>
+          {x} , {y}
+        </div>
+      </div>
     </div>
   );
 }

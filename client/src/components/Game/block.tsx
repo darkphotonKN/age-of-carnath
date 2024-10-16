@@ -20,6 +20,9 @@ function GameBlock({
   content,
   tooltipProps,
 }: GameBlockProps) {
+  /**
+   * All block content render logic.
+   **/
   function renderBlockContent() {
     const { x, y } = coords;
 
@@ -46,15 +49,27 @@ function GameBlock({
         return;
     }
   }
+
+  /**
+   * All tooltip render logic.
+   **/
+  function renderTooltip() {
+    if (
+      tooltipProps &&
+      tooltipProps.position.x === coords.x &&
+      tooltipProps.position.y === coords.y
+    ) {
+      return <Tooltip {...tooltipProps} />;
+    }
+  }
+
   return (
     <div
-      className={`relative border border-customBorderGray w-[53px] h-[53px] ${highlight ? "bg-customBorderGray" : ""}`}
+      className={`relative border border-customBorderGray w-[53px] h-[53px] cursor-pointer ${highlight ? "bg-customBorderGray" : ""}`}
       // className={`w-[35px] h-[35px] ${highlight ? "bg-customBorderGray" : ""}`}
       onMouseEnter={onMouseEnter}
     >
-      {tooltipProps &&
-        tooltipProps.position.x === coords.x &&
-        tooltipProps.position.x === coords.x && <Tooltip {...tooltipProps} />}
+      {renderTooltip()}
       {renderBlockContent()}
     </div>
   );

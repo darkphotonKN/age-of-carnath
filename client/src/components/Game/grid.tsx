@@ -20,6 +20,7 @@ function GameGrid() {
   const [currentTarget, setCurrentTarget] = useState<TooltipProps>();
 
   useEffect(() => {
+    // TODO: Update to real grid
     const COL_SIZE = 24;
     const ROW_SIZE = 16;
 
