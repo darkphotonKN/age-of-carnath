@@ -31,6 +31,10 @@ func TestNewMultiplayerServer_FindMatch_HalfFull(t *testing.T) {
 		Name: "TEST PLAYER",
 	}
 
+	// initialize each game struct
+	mockMatches[gameOneId] = &game.Game{}
+	mockMatches[gameTwoId] = &game.Game{}
+
 	mockMatches[gameOneId].Players = append(mockMatches[gameOneId].Players, models.Player{ID: mockPlayerOneId, Name: "Mock Player 1"})
 	mockMatches[gameOneId].Players = append(mockMatches[gameOneId].Players, models.Player{ID: mockPlayerTwoId, Name: "Mock Player 2"})
 	mockMatches[gameTwoId].Players = append(mockMatches[gameTwoId].Players, models.Player{ID: mockPlayerThreeId, Name: "Mock Player 3"})
@@ -43,6 +47,11 @@ func TestNewMultiplayerServer_FindMatch_HalfFull(t *testing.T) {
 	fmt.Println("matchFoundId:", matchFoundId)
 
 	expectedMatches := make(map[uuid.UUID]*game.Game)
+
+	// initialize each game struct
+	expectedMatches[gameOneId] = &game.Game{}
+	expectedMatches[gameTwoId] = &game.Game{}
+
 	expectedMatches[gameOneId].Players = append(expectedMatches[gameOneId].Players, models.Player{ID: mockPlayerOneId, Name: "Mock Player 1"})
 	expectedMatches[gameOneId].Players = append(expectedMatches[gameOneId].Players, models.Player{ID: mockPlayerTwoId, Name: "Mock Player 2"})
 	expectedMatches[gameTwoId].Players = append(expectedMatches[gameTwoId].Players, models.Player{ID: mockPlayerThreeId, Name: "Mock Player 3"})
@@ -79,6 +88,10 @@ func TestNewMultiplayerServer_FindMatch_Full(t *testing.T) {
 		Name: "TEST PLAYER",
 	}
 
+	// initialize each game struct
+	mockMatches[gameOneId] = &game.Game{}
+	mockMatches[gameTwoId] = &game.Game{}
+
 	mockMatches[gameOneId].Players = append(mockMatches[gameOneId].Players, models.Player{ID: mockPlayerOneId, Name: "Mock Player 1"})
 	mockMatches[gameOneId].Players = append(mockMatches[gameOneId].Players, models.Player{ID: mockPlayerTwoId, Name: "Mock Player 2"})
 	mockMatches[gameTwoId].Players = append(mockMatches[gameTwoId].Players, models.Player{ID: mockPlayerThreeId, Name: "Mock Player 3"})
@@ -92,12 +105,13 @@ func TestNewMultiplayerServer_FindMatch_Full(t *testing.T) {
 
 	expectedMatches := make(map[uuid.UUID]*game.Game)
 
+	// initialize each game struct
+	expectedMatches[gameOneId] = &game.Game{}
+	expectedMatches[gameTwoId] = &game.Game{}
+	expectedMatches[matchFoundId] = &game.Game{}
+
 	fmt.Printf("matchFoundId: %v, existing slice: %+v\n", matchFoundId, expectedMatches[matchFoundId])
 	fmt.Println("matchFoundId type:", reflect.TypeOf(matchFoundId))
-
-	if expectedMatches[matchFoundId] == nil {
-		expectedMatches[matchFoundId] = &game.Game{Players: []models.Player{}}
-	}
 
 	expectedMatches[gameOneId].Players = append(expectedMatches[gameOneId].Players, models.Player{ID: mockPlayerOneId, Name: "Mock Player 1"})
 	expectedMatches[gameOneId].Players = append(expectedMatches[gameOneId].Players, models.Player{ID: mockPlayerTwoId, Name: "Mock Player 2"})
@@ -126,6 +140,9 @@ func TestNewMultiplayerServer_FindMatch_Multiple(t *testing.T) {
 	testPlayerThreeId := uuid.New()
 	gameOneId := uuid.New()
 
+	// initialize each game struct
+	mockMatches[gameOneId] = &game.Game{}
+
 	// setup test players to be added
 	testPlayer := models.Player{
 		ID:   testPlayerId,
@@ -153,6 +170,10 @@ func TestNewMultiplayerServer_FindMatch_Multiple(t *testing.T) {
 	testMultiplayerServer.findMatch(testPlayer3)
 
 	expectedMatches := make(map[uuid.UUID]*game.Game)
+	expectedMatches[gameOneId] = &game.Game{}
+	expectedMatches[matchFoundIdOne] = &game.Game{}
+	expectedMatches[matchFoundIdTwo] = &game.Game{}
+
 	expectedMatches[gameOneId].Players = append(expectedMatches[gameOneId].Players, models.Player{ID: mockPlayerOneId, Name: "Mock Player 1"})
 	expectedMatches[matchFoundIdOne].Players = append(expectedMatches[matchFoundIdOne].Players, testPlayer)
 	expectedMatches[matchFoundIdTwo].Players = append(expectedMatches[matchFoundIdTwo].Players, testPlayer2)
