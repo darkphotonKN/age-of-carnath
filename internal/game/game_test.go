@@ -1,12 +1,14 @@
 package game
 
 import (
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestNewGame_GridState(t *testing.T) {
-	game := NewGame(3, 3)
+	game := NewGame(uuid.New(), 3, 3)
 
 	expectedGridState := GridState{
 		{

@@ -144,7 +144,7 @@ func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 		var matchFull bool = false
 		fmt.Println("Length of match:", len(match))
 
-		// match is full is length of match has reached 2
+		// match is "full" is length of match has reached 2
 		matchFull = len(match) == 2
 
 		// join match if not full
@@ -157,26 +157,26 @@ func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 	}
 
 	// iteration over, meaning all matches are full, create a new one
-	newPlayers := []models.Player{player}
-
-	newMatchUuid := uuid.New()
 
 	// initalize a game
-	// s.initializeGame(matchId)
+	newGame := s.initializeGame(&player)
 
-	s.matches[newMatchUuid] = &game.Game{
-		Players: newPlayers,
-	}
+	s.matches[newGame.ID] = newGame
 
-	return newMatchUuid
+	return newGame.ID
 }
 
 /**
 * Initalizes a game with the Game struct and methods.
 **/
-func (s *MultiplayerServer) initializeGame(matchId uuid.UUID) {
-	// newGame := game.NewGame(30, 50)
+func (s *MultiplayerServer) initializeGame(player *models.Player) *game.Game {
+	// NOTE: Reminder - no DI refactor needed, as each game is a new instance and
+	// there is no shared global game instance / information.
+	newMatchUuid := uuid.New()
+	newGame := game.NewGame(newMatchUuid, 30, 50)
+	newGame.SpawnPlayerOnGrid(player, &s.mu)
 
+	return newGame
 }
 
 // --- Helpers ---

@@ -1,6 +1,11 @@
 package game
 
 import (
+	"fmt"
+	"math/rand"
+	"sync"
+	"time"
+
 	"github.com/darkphotonKN/age-of-carnath/internal/models"
 	"github.com/google/uuid"
 )
@@ -68,10 +73,11 @@ type GridBlock struct {
 **/
 type GridState [][]GridBlock
 
-func NewGame(gridRows uint8, gridCols uint8) *Game {
+func NewGame(id uuid.UUID, gridRows uint8, gridCols uint8) *Game {
 	newGrid := initializeGrid(gridRows, gridCols)
 
 	return &Game{
+		ID:        id,
 		GridState: newGrid,
 	}
 }
@@ -97,4 +103,36 @@ func initializeGrid(rows uint8, cols uint8) GridState {
 		}
 	}
 	return newGridState
+}
+
+// -- Game Struct Methods --
+
+/**
+* Spawns player randomly on the map. TODO: Currently not random.
+**/
+func (g *Game) SpawnPlayerOnGrid(p *models.Player, mu *sync.Mutex) {
+	// NOTE: prevent race conditions if two players happen to spawn
+	// at the same time to access the same resources
+	mu.Lock()
+	defer mu.Unlock()
+
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	// Generate a random number between 0 and length of rows (y) (inclusive)
+	randomY := r.Intn(len(g.GridState))
+	fmt.Println("Random spawn row, y coord:", randomY)
+
+	// Generates a random number between 0 and the length of columns (x), (inclusive)
+	randomX := r.Intn(len(g.GridState[0]))
+	fmt.Println("Random spawn row, x coord:", randomX)
+
+	g.GridState[randomY][randomX] = GridBlock{
+		Position:    Position{x: uint8(randomX), y: uint8(randomY)},
+		ContentType: player,
+		Content:     Content{Player: p}, // inject player
+	}
+
+	// adds player to list of players
+	g.Players = []models.Player{*p} // add player as first player
+
 }
