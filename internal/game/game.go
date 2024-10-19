@@ -3,7 +3,6 @@ package game
 import (
 	"fmt"
 	"math/rand"
-	"sync"
 	"time"
 
 	"github.com/darkphotonKN/age-of-carnath/internal/models"
@@ -110,11 +109,9 @@ func initializeGrid(rows uint8, cols uint8) GridState {
 /**
 * Spawns player randomly on the map. TODO: Currently not random.
 **/
-func (g *Game) SpawnPlayerOnGrid(p *models.Player, mu *sync.Mutex) {
+func (g *Game) SpawnPlayerOnGrid(p *models.Player) {
 	// NOTE: prevent race conditions if two players happen to spawn
 	// at the same time to access the same resources
-	mu.Lock()
-	defer mu.Unlock()
 
 	r := rand.New(rand.NewSource(time.Now().UnixNano()))
 

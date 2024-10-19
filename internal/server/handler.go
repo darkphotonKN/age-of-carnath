@@ -22,7 +22,6 @@ import (
 * and passes them off to individual goroutines to be handled concurrently.
 **/
 func (s *MultiplayerServer) HandleMatchConn(c *gin.Context) {
-	// upgrade the HTTP connection to a WebSocket connection
 	conn, err := s.upgrader.Upgrade(c.Writer, c.Request, nil)
 
 	if err != nil {
@@ -43,6 +42,7 @@ func (s *MultiplayerServer) HandleMatchConn(c *gin.Context) {
 * at a time, meaning its best to utilize *unbuffered* channels to prevent
 * a single client from locking the entire server.
 **/
+
 func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 	// removes client and closes connection
 	defer func() {
@@ -113,9 +113,12 @@ func (s *MultiplayerServer) removeClient(conn *websocket.Conn) {
 	}
 }
 
-/**
-* Stops a match and removes it from the map of matches that a player belongs to. TODO: stop the match
-**/
+/*
+*
+* Stops a match and removes it from the map of matches that a player belongs to.
+* TODO: stop the match for all players.
+*
+ */
 func (s *MultiplayerServer) StopMatch(playerId uuid.UUID) error {
 	// search for player in a match
 	for matchIndex, game := range s.matches {
@@ -135,10 +138,13 @@ func (s *MultiplayerServer) StopMatch(playerId uuid.UUID) error {
 * TODO: For v1.1: Add matchmaking algorithm.
 **/
 func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
-	fmt.Println("Finding match...")
+	// maps are not thread-safe, can add locking to be sure incase match was removed / altered
+	s.mu.Lock()
+	defer s.mu.Unlock()
 
 	// loop through current matches and find an opponent still waiting
 	for matchId, game := range s.matches {
+
 		match := game.Players
 
 		// check length of match to know if its full
@@ -150,6 +156,7 @@ func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 
 		// join match if not full
 		if !matchFull {
+
 			s.matches[matchId].Players = append(s.matches[matchId].Players, player)
 
 			// end search
@@ -175,7 +182,7 @@ func (s *MultiplayerServer) initializeGame(player *models.Player) *game.Game {
 	// there is no shared global game instance / information.
 	newMatchUuid := uuid.New()
 	newGame := game.NewGame(newMatchUuid, 30, 50)
-	newGame.SpawnPlayerOnGrid(player, &s.mu)
+	newGame.SpawnPlayerOnGrid(player)
 
 	return newGame
 }
