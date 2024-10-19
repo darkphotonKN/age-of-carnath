@@ -74,6 +74,7 @@ func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 		if err != nil {
 			fmt.Println("Error when decoding payload.")
 			conn.WriteJSON(GameMessage{Action: "Error", Payload: "Your message to server was the incorrect format and could not be decoded as JSON."})
+			continue
 		}
 
 		clientPackage := ClientPackage{GameMessage: decodedMsg, Conn: conn}
