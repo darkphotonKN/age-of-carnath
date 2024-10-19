@@ -15,44 +15,44 @@ func Test_NewGame_GridState(t *testing.T) {
 	expectedGridState := GridState{
 		{
 			{
-				ContentType: empty,
+				ContentType: EmptyType,
 				Position:    Position{x: 0, y: 0},
 			},
 			{
-				ContentType: empty,
+				ContentType: EmptyType,
 				Position:    Position{x: 1, y: 0},
 			},
 			{
-				ContentType: empty,
+				ContentType: EmptyType,
 				Position:    Position{x: 2, y: 0},
 			},
 		},
 		{
 			{
-				ContentType: empty,
+				ContentType: EmptyType,
 				Position:    Position{x: 0, y: 1},
 			},
 
 			{
-				ContentType: empty,
+				ContentType: EmptyType,
 				Position:    Position{x: 1, y: 1},
 			},
 			{
-				ContentType: empty,
+				ContentType: EmptyType,
 				Position:    Position{x: 2, y: 1},
 			},
 		},
 		{
 			{
-				ContentType: empty,
+				ContentType: EmptyType,
 				Position:    Position{x: 0, y: 2},
 			},
 			{
-				ContentType: empty,
+				ContentType: EmptyType,
 				Position:    Position{x: 1, y: 2},
 			},
 			{
-				ContentType: empty,
+				ContentType: EmptyType,
 				Position:    Position{x: 2, y: 2},
 			},
 		},

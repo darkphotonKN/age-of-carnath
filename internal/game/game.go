@@ -37,9 +37,9 @@ type Position struct {
 type ContentType string
 
 const (
-	empty  ContentType = "empty"
-	player ContentType = "player"
-	item   ContentType = "item"
+	EmptyType  ContentType = "empty"
+	PlayerType ContentType = "player"
+	ItemType   ContentType = "item"
 )
 
 /**
@@ -82,6 +82,16 @@ func NewGame(id uuid.UUID, gridRows uint8, gridCols uint8) *Game {
 }
 
 /**
+* Initalizes a game with a initial player.
+**/
+func InitializeGame(player *models.Player) *Game {
+	newMatchUuid := uuid.New()
+	newGame := NewGame(newMatchUuid, 30, 50)
+	newGame.SpawnPlayerOnGrid(player)
+	return newGame
+}
+
+/**
 * Initalizes base game grid
 **/
 func initializeGrid(rows uint8, cols uint8) GridState {
@@ -97,7 +107,7 @@ func initializeGrid(rows uint8, cols uint8) GridState {
 					x: uint8(colIndex),
 					y: uint8(rowIndex),
 				},
-				ContentType: empty,
+				ContentType: EmptyType,
 			}
 		}
 	}
@@ -107,7 +117,7 @@ func initializeGrid(rows uint8, cols uint8) GridState {
 // -- Game Struct Methods --
 
 /**
-* Spawns player randomly on the map. TODO: Currently not random.
+* Spawns player randomly on the map.
 **/
 func (g *Game) SpawnPlayerOnGrid(p *models.Player) {
 	// NOTE: prevent race conditions if two players happen to spawn
@@ -125,11 +135,29 @@ func (g *Game) SpawnPlayerOnGrid(p *models.Player) {
 
 	g.GridState[randomY][randomX] = GridBlock{
 		Position:    Position{x: uint8(randomX), y: uint8(randomY)},
-		ContentType: player,
-		Content:     Content{Player: p}, // inject player
+		ContentType: PlayerType,
+		Content:     Content{Player: p},
 	}
 
 	// adds player to list of players
 	g.Players = []models.Player{*p} // add player as first player
 
+}
+
+/**
+* Allows a player to join an existing game that has yet to start.
+**/
+func (g *Game) JoinGame(p *models.Player) {
+	// repeatedly check randomly until an open space is found
+	// for {
+	//
+	// }
+
+	g.GridState[0][0] = GridBlock{
+		Position:    Position{x: uint8(0), y: uint8(0)},
+		ContentType: PlayerType,
+		Content:     Content{Player: p},
+	}
+
+	g.Players = append(g.Players, *p)
 }

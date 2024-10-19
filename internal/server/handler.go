@@ -157,7 +157,8 @@ func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 		// join match if not full
 		if !matchFull {
 
-			s.matches[matchId].Players = append(s.matches[matchId].Players, player)
+			// s.matches[matchId].Players = append(s.matches[matchId].Players, player)
+			game.JoinGame(&player)
 
 			// end search
 			return matchId
@@ -167,7 +168,7 @@ func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 	// iteration over, meaning all matches are full, create a new one
 
 	// initalize a game
-	newGame := s.initializeGame(&player)
+	newGame := game.InitializeGame(&player)
 
 	s.matches[newGame.ID] = newGame
 
@@ -175,17 +176,8 @@ func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 }
 
 /**
-* Initalizes a game with the Game struct and methods.
+* Joins an existing game that has yet to start.
 **/
-func (s *MultiplayerServer) initializeGame(player *models.Player) *game.Game {
-	// NOTE: Reminder - no DI refactor needed, as each game is a new instance and
-	// there is no shared global game instance / information.
-	newMatchUuid := uuid.New()
-	newGame := game.NewGame(newMatchUuid, 30, 50)
-	newGame.SpawnPlayerOnGrid(player)
-
-	return newGame
-}
 
 // --- Helpers ---
 

@@ -3,7 +3,9 @@ package server
 import (
 	"fmt"
 
+	"github.com/darkphotonKN/age-of-carnath/internal/game"
 	"github.com/darkphotonKN/age-of-carnath/internal/models"
+	"github.com/google/uuid"
 )
 
 /**
@@ -14,7 +16,7 @@ func (s *MultiplayerServer) MessageHub() {
 
 	for {
 		fmt.Printf("Current client connections in session: %+v\n\n", s.clientConns)
-		fmt.Printf("Current ongoing matches %+v\n\n", s.matches)
+		printOngoingMatches(s.matches)
 
 		select {
 		case clientPackage := <-s.serverChan:
@@ -49,5 +51,25 @@ func (s *MultiplayerServer) MessageHub() {
 				s.findMatch(player)
 			}
 		}
+	}
+}
+
+func printOngoingMatches(matches map[uuid.UUID]*game.Game) {
+	fmt.Println("Current Matches")
+	fmt.Println("---------------")
+
+	for _, match := range matches {
+
+		// filter out empty cells for testing
+		var nonEmptyGrid []game.GridBlock
+		for _, row := range match.GridState {
+			for _, block := range row {
+				if block.ContentType != game.EmptyType {
+					nonEmptyGrid = append(nonEmptyGrid, block)
+				}
+			}
+		}
+
+		fmt.Printf("Match\nplayers: %+v\nNon-Empty GridState: %+v\n\n", match.Players, nonEmptyGrid)
 	}
 }
