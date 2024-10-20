@@ -72,7 +72,8 @@ type GridBlock struct {
 **/
 type GridState [][]GridBlock
 
-func NewGame(id uuid.UUID, gridRows uint8, gridCols uint8) *Game {
+func NewGame(gridRows uint8, gridCols uint8) *Game {
+	id := uuid.New()
 	newGrid := initializeGrid(gridRows, gridCols)
 
 	return &Game{
@@ -85,8 +86,7 @@ func NewGame(id uuid.UUID, gridRows uint8, gridCols uint8) *Game {
 * Initalizes a game with a initial player.
 **/
 func InitializeGame(player *models.Player) *Game {
-	newMatchUuid := uuid.New()
-	newGame := NewGame(newMatchUuid, 30, 50)
+	newGame := NewGame(30, 50)
 	newGame.SpawnPlayerOnGrid(player)
 	return newGame
 }
@@ -141,7 +141,6 @@ func (g *Game) SpawnPlayerOnGrid(p *models.Player) {
 
 	// adds player to list of players
 	g.Players = []models.Player{*p} // add player as first player
-
 }
 
 /**

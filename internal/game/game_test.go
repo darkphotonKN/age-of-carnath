@@ -10,7 +10,7 @@ import (
 )
 
 func Test_NewGame_GridState(t *testing.T) {
-	game := NewGame(uuid.New(), 3, 3)
+	game := NewGame(3, 3)
 
 	expectedGridState := GridState{
 		{
@@ -65,23 +65,24 @@ func Test_NewGame_GridState(t *testing.T) {
 func Test_SpawnPlayerOnGrid(t *testing.T) {
 
 	// create mock player
+	playerId := uuid.New()
 	mockPlayer := models.Player{
-		ID:   uuid.New(),
+		ID:   playerId,
 		Name: "mock player",
 	}
 
-	game := NewGame(uuid.New(), 3, 3)
+	game := NewGame(3, 3)
 
 	// spawns player in grid at a random location
 	game.SpawnPlayerOnGrid(&mockPlayer)
 
 	// test if player exists at all
 	playerExists := false
-	for _, row := range game.GridState {
 
+	for _, row := range game.GridState {
 		for _, block := range row {
 			// can check for nil, as its a pointer
-			if block.Content.Player != nil && block.Content.Player.ID == mockPlayer.ID {
+			if block.Content.Player != nil && block.Content.Player.ID == playerId {
 
 				fmt.Printf("PLAYER EXISTS!!! Player: %+v\n\n", block)
 				playerExists = true
@@ -92,5 +93,39 @@ func Test_SpawnPlayerOnGrid(t *testing.T) {
 	if !playerExists {
 		fmt.Printf("gridState: %+v\n\n", game.GridState)
 		t.Errorf("Expected player to be spawned, but player did not exist inside the grid state.")
+	}
+}
+
+// Test PLayer joining a pre-existing match.
+func Test_JoinGame(t *testing.T) {
+	game := NewGame(2, 2)
+
+	// create mock player
+	playerId := uuid.New()
+
+	mockPlayer := models.Player{
+		ID:   playerId,
+		Name: "Mock Player 1",
+	}
+
+	game.JoinGame(&mockPlayer)
+
+	// search grid that player exists
+	playerExists := false
+
+	for _, row := range game.GridState {
+		for _, block := range row {
+			// can check for nil, as its a pointer
+			if block.Content.Player != nil && block.Content.Player.ID == playerId {
+
+				fmt.Printf("PLAYER EXISTS!!! Player: %+v\n\n", block)
+				playerExists = true
+			}
+		}
+	}
+
+	if !playerExists {
+		fmt.Printf("gridState: %+v\n\n", game.GridState)
+		t.Errorf("Expected player to have joined game, but is but player did not exist inside the grid state.")
 	}
 }

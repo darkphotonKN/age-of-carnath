@@ -58,10 +58,11 @@ func printOngoingMatches(matches map[uuid.UUID]*game.Game) {
 	fmt.Println("Current Matches")
 	fmt.Println("---------------")
 
-	for _, match := range matches {
+	for id, match := range matches {
 
 		// filter out empty cells for testing
 		var nonEmptyGrid []game.GridBlock
+
 		for _, row := range match.GridState {
 			for _, block := range row {
 				if block.ContentType != game.EmptyType {
@@ -70,6 +71,6 @@ func printOngoingMatches(matches map[uuid.UUID]*game.Game) {
 			}
 		}
 
-		fmt.Printf("Match\nplayers: %+v\nNon-Empty GridState: %+v\n\n", match.Players, nonEmptyGrid)
+		fmt.Printf("Match %s\nplayers: %+v\nNon-Empty GridState: %+v\n\n", id, match.Players, nonEmptyGrid)
 	}
 }

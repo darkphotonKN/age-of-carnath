@@ -4,19 +4,21 @@
 
 Age of Carnath is a 1v1 is a turn-based multiplayer RPG game where two players engage in player-vs-player (PvP) combat.
 
-The backend server is written in Go, using WebSockets to facilitate real-time communication between the players. The server is designed to manage player connections, game state, and communication in a 1v1 format, spinning up unique instances for two 1v1 players while concurrently keeping the entire connected player base informed of the latest updates.
+The backend server is written in Go, using WebSockets to facilitate real-time communication between the players. The server is designed to manage player connections, game state, and communication in a 1v1 format, spinning up unique instances for two 1v1 players while concurrently keeping the entire connected player base informed of the latest updates. Go was chosen for performance and simplicity.
 
-The client-side interface is developed in typescript reactjs with the nextjs framework, and involves in drawing the game's battle arena, showing the information of the players, and the UI which control the flow of the game.
+The client-side interface is developed in typescript reactjs with the nextjs framework, and focuses rendering the game's battle arena, showing the information of the players, and the UI which control the flow of the game. Despite react performance not being optimate for rendering many updates on a game-like grid these tools were chosen due to the familiarity of the framework.
 
 ### Features
 
-- Real-time communication: The server uses WebSockets to enable real-time player interactions. Even though the game is turn based, the tracking of events and actual updates in the game happens real-time.
+- Real-time communication: The server uses WebSockets to handle real-time player interactions. Even though the game is turn based, the tracking of events and actual updates in the game happens real-time.
 
 - Game state management: The server tracks each player's state, allowing actions like attacks, defenses, and movements to be broadcast to the other player instantly.
 
-- Game loop: Players take turns in combat, with actions communicated through WebSocket messages.
+- Game loop: Players take turns in combat, with actions communicated through WebSocket messages, and the game loop tracks vital information to keep matches in sync.
 
-- 1v1 player management and matchmaking: The server supports 1v1 matches, with both players connecting via WebSocket connections. The matches between two players are handled by creating a unique instance between two players when a match is found, whereby their actions are handled and broadcast to each other.
+- Matchmaking: Matchmaking alogithms to help players find open matches to play.
+
+- 1v1 player management: Hanldes events of 1v1 matches, with both players connecting via WebSocket connections. The matches between two players are handled by creating a unique instance between two players when a match is found, whereby their actions are handled and broadcast to each other.
 
 ### Game Server
 
@@ -30,13 +32,15 @@ There was a big design decision to use **unbuffered** channels as a result, sinc
 
 A simple read / write loop for websockets therefore turned into a slighty more complex read / write via websocket and with a communication layer via an unbuffered channel. Thankfully with go's channels and goroutines being performant the read / write remained incredibly smooth once handled appropriately.
 
+Race conditions were the other challenge that made multiple connections a challenge, but more details on this in the game logic section.
+
 ### Client Game State & Logic
 
-The frontend client was coded in reactjs, using a mixture of zustand for global statemanagement and react's standard state for game interactions.
+The frontend client was coded in reactjs, using a mixture of zustand for global statemanagement and react's built-in state hooks for game interactions.
 
 #### GameGrid Component
 
-The core component for rendering the game's visuals and controlling the syncing between of game state between client and server.
+The core component for rendering the game's visuals and controlling the syncing between game state of the client and server.
 
 #### Game State Handling
 

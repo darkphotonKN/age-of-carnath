@@ -32,12 +32,13 @@ func TestNewMultiplayerServer_FindMatch_HalfFull(t *testing.T) {
 	}
 
 	// initialize each game struct
-	mockMatches[gameOneId] = &game.Game{}
-	mockMatches[gameTwoId] = &game.Game{}
+	mockPlayer1 := models.Player{ID: mockPlayerOneId, Name: "Mock Player 1"}
+	mockMatches[gameOneId] = game.InitializeGame(&mockPlayer1)
 
-	mockMatches[gameOneId].Players = append(mockMatches[gameOneId].Players, models.Player{ID: mockPlayerOneId, Name: "Mock Player 1"})
+	mockPlayer2 := models.Player{ID: mockPlayerThreeId, Name: "Mock Player 3"}
+	mockMatches[gameTwoId] = game.InitializeGame(&mockPlayer2)
+
 	mockMatches[gameOneId].Players = append(mockMatches[gameOneId].Players, models.Player{ID: mockPlayerTwoId, Name: "Mock Player 2"})
-	mockMatches[gameTwoId].Players = append(mockMatches[gameTwoId].Players, models.Player{ID: mockPlayerThreeId, Name: "Mock Player 3"})
 
 	// pre-feed matches with these two games
 	testMultiplayerServer.matches = mockMatches
@@ -89,12 +90,12 @@ func TestNewMultiplayerServer_FindMatch_Full(t *testing.T) {
 	}
 
 	// initialize each game struct
-	mockMatches[gameOneId] = &game.Game{}
-	mockMatches[gameTwoId] = &game.Game{}
+	mockPlayer1 := models.Player{ID: mockPlayerOneId, Name: "Mock Player 1"}
+	mockMatches[gameOneId] = game.InitializeGame(&mockPlayer1)
+	mockPlayer3 := models.Player{ID: mockPlayerThreeId, Name: "Mock Player 3"}
+	mockMatches[gameTwoId] = game.InitializeGame(&mockPlayer3)
 
-	mockMatches[gameOneId].Players = append(mockMatches[gameOneId].Players, models.Player{ID: mockPlayerOneId, Name: "Mock Player 1"})
 	mockMatches[gameOneId].Players = append(mockMatches[gameOneId].Players, models.Player{ID: mockPlayerTwoId, Name: "Mock Player 2"})
-	mockMatches[gameTwoId].Players = append(mockMatches[gameTwoId].Players, models.Player{ID: mockPlayerThreeId, Name: "Mock Player 3"})
 	mockMatches[gameTwoId].Players = append(mockMatches[gameTwoId].Players, models.Player{ID: mockPlayerFourId, Name: "Mock Player 4"})
 
 	// pre-feed matches with these two games
@@ -141,7 +142,8 @@ func TestNewMultiplayerServer_FindMatch_Multiple(t *testing.T) {
 	gameOneId := uuid.New()
 
 	// initialize each game struct
-	mockMatches[gameOneId] = &game.Game{}
+	mockPlayer1 := models.Player{ID: mockPlayerOneId, Name: "Mock Player 1"}
+	mockMatches[gameOneId] = game.InitializeGame(&mockPlayer1)
 
 	// setup test players to be added
 	testPlayer := models.Player{
@@ -158,8 +160,6 @@ func TestNewMultiplayerServer_FindMatch_Multiple(t *testing.T) {
 		ID:   testPlayerThreeId,
 		Name: "TEST PLAYER 3",
 	}
-
-	mockMatches[gameOneId].Players = append(mockMatches[gameOneId].Players, models.Player{ID: mockPlayerOneId, Name: "Mock Player 1"})
 
 	// pre-feed matches with these two games
 	testMultiplayerServer.matches = mockMatches
