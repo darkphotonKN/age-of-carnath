@@ -94,6 +94,19 @@ func Test_SpawnPlayerOnGrid(t *testing.T) {
 		fmt.Printf("gridState: %+v\n\n", game.GridState)
 		t.Errorf("Expected player to be spawned, but player did not exist inside the grid state.")
 	}
+
+	// Test Players Slice
+	playerExists = false // reset from first test
+	for _, player := range game.Players {
+		if player.ID == playerId {
+			playerExists = true
+		}
+	}
+
+	if !playerExists {
+		fmt.Printf("gridState: %+v\n\n", game.GridState)
+		t.Errorf("Player did not found in player slice.")
+	}
 }
 
 // Test PLayer joining a pre-existing match.
@@ -127,5 +140,20 @@ func Test_JoinGame(t *testing.T) {
 	if !playerExists {
 		fmt.Printf("gridState: %+v\n\n", game.GridState)
 		t.Errorf("Expected player to have joined game, but is but player did not exist inside the grid state.")
+	}
+
+	// Test Players Slice
+
+	// check player exists in the player slice
+	playerExists = false // reset from first test
+	for _, player := range game.Players {
+		if player.ID == playerId {
+			playerExists = true
+		}
+	}
+
+	if !playerExists {
+		fmt.Printf("gridState: %+v\n\n", game.GridState)
+		t.Errorf("Player did not found in player slice.")
 	}
 }

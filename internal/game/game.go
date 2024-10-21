@@ -120,6 +120,7 @@ func initializeGrid(rows uint8, cols uint8) GridState {
 * Spawns player randomly on the map.
 **/
 func (g *Game) SpawnPlayerOnGrid(p *models.Player) {
+	fmt.Printf("Attempting %s to SPAWN game.", p.Name)
 	// NOTE: prevent race conditions if two players happen to spawn
 	// at the same time to access the same resources
 
@@ -127,7 +128,7 @@ func (g *Game) SpawnPlayerOnGrid(p *models.Player) {
 
 	// Generate a random number between 0 and length of rows (y) (inclusive)
 	randomY := r.Intn(len(g.GridState))
-	fmt.Println("Random spawn row, y coord:", randomY)
+	fmt.Println("Random spawn row, y coord:\n", randomY)
 
 	// Generates a random number between 0 and the length of columns (x), (inclusive)
 	randomX := r.Intn(len(g.GridState[0]))
@@ -147,16 +148,33 @@ func (g *Game) SpawnPlayerOnGrid(p *models.Player) {
 * Allows a player to join an existing game that has yet to start.
 **/
 func (g *Game) JoinGame(p *models.Player) {
+	fmt.Printf("Attempting %s to JOIN game.\n", p.Name)
 	// repeatedly check randomly until an open space is found
-	// for {
-	//
-	// }
+	var randomY, randomX int
 
-	g.GridState[0][0] = GridBlock{
+	r := rand.New(rand.NewSource(time.Now().UnixNano()))
+
+	for {
+		// Generate a random number between 0 and length of rows (y) (inclusive)
+		randomY = r.Intn(len(g.GridState) - 1)
+		fmt.Println("Random spawn row, y coord:", randomY)
+
+		// Generates a random number between 0 and the length of columns (x), (inclusive)
+		randomX = r.Intn(len(g.GridState[0]) - 1)
+		fmt.Println("Random spawn row, x coord:", randomX)
+
+		playerExists := g.GridState[randomY][randomX].ContentType == PlayerType
+
+		if !playerExists {
+			break
+		}
+	}
+
+	g.GridState[randomY][randomX] = GridBlock{
 		Position:    Position{x: uint8(0), y: uint8(0)},
 		ContentType: PlayerType,
 		Content:     Content{Player: p},
 	}
-
 	g.Players = append(g.Players, *p)
+
 }

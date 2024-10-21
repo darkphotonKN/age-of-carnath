@@ -9,5 +9,8 @@ run: build
 test:
 	@go test ./... --cover
 
+test-game-preview:
+	@go test ./internal/game/ --cover -coverprofile=coverage.out 
+	@go tool cover -html=coverage.out
 
 
