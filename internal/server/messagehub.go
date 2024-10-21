@@ -16,6 +16,7 @@ func (s *MultiplayerServer) MessageHub() {
 
 	for {
 		fmt.Printf("Current client connections in session: %+v\n\n", s.clientConns)
+		// Logs Formatted Ongoing Matches TODO: Remove after testing
 		printOngoingMatches(s.matches)
 
 		select {
@@ -47,8 +48,9 @@ func (s *MultiplayerServer) MessageHub() {
 
 				s.addClient(clientPackage.Conn, player)
 
-				// initiating finding a match for the player
+				// initiating finding a match for the player and write back to client(s) the updated game state
 				s.findMatch(player)
+
 			}
 		}
 	}
