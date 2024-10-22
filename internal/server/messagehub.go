@@ -48,9 +48,8 @@ func (s *MultiplayerServer) MessageHub() {
 
 				s.addClient(clientPackage.Conn, player)
 
-				// initiating finding a match for the player and write back to client(s) the updated game state
-				s.findMatch(player)
-
+				// initiating matchmaking for the player and write back to client in its own goroutine
+				go s.findMatchAndBroadcast(player)
 			}
 		}
 	}

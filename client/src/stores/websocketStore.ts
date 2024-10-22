@@ -39,8 +39,8 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
 
     const socket = new WebSocket(`ws://localhost:4111/ws`);
 
-    socket.onopen = () => {
-      console.log("Connected to WebSocket server!");
+    socket.onopen = (event) => {
+      console.log("Connection Server Info on Open:", event);
       get().setWebSocket(socket);
     };
 
@@ -49,7 +49,11 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
     };
 
     socket.onmessage = (event) => {
-      console.log(event.data);
+      console.log("Received from Server:", event.data);
+
+      const serverMsgJson = JSON.parse(event.data);
+
+      console.log("JSON from server:", serverMsgJson);
 
       if (typeof event.data === "string") {
         try {

@@ -57,19 +57,42 @@ func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 /**
 * Wrapper function for goroutine to find a match and respond the client(s) with the game state.
 **/
-func (s *MultiplayerServer) FindMatchAndBroadcast(p models.Player) {
-	// find the match concurrently
-	go s.findMatch(p)
+func (s *MultiplayerServer) findMatchAndBroadcast(p models.Player) {
+	// handles communication match find results
+	matchFindChan := make(chan uuid.UUID)
+
+	// find the match concurrently, sending to the channel once it's done
+	go func() {
+		id := s.findMatch(p)
+		matchFindChan <- id
+	}()
 
 	// wait until match is found
-	// TODO:
-	// - Create channel to communicate match found concurrently.
-	// - Update findMatch() to return multiple things, like match information not just the id.
-	// - Update tests to follow new flow (with channels).
-	// game := <-matchFound
+	id := <-matchFindChan
 
 	// broadcast to all users participating in the match
+	s.broadcastGameStateToPlayers(id)
+}
 
+/**
+* Broadcasts current game state to all players of a particular match.
+**/
+func (s *MultiplayerServer) broadcastGameStateToPlayers(matchId uuid.UUID) {
+	// TODO: Refactor to include better way of access player connections.
+	gameState := s.matches[matchId]
+
+	// loop through all players of the game and find corresponding
+	// client's websocket connection to broadcast
+	for _, player := range gameState.Players {
+		for conn, client := range s.clientConns {
+			if player.ID == client.ID {
+				conn.WriteJSON(GameMessage{
+					Action:  find_match,
+					Payload: *gameState,
+				})
+			}
+		}
+	}
 }
 
 // --- Helpers ---
