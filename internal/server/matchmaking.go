@@ -9,6 +9,26 @@ import (
 )
 
 /**
+* Wrapper function for goroutine to find a match and respond the client(s) with the game state.
+**/
+func (s *MultiplayerServer) findMatchAndBroadcast(p models.Player) {
+	// handles communication match find results
+	matchFindChan := make(chan uuid.UUID)
+
+	// find the match concurrently, sending to the channel once it's done
+	go func() {
+		id := s.findMatch(p)
+		matchFindChan <- id
+	}()
+
+	// wait until match is found
+	id := <-matchFindChan
+
+	// broadcast to all users participating in the match
+	s.broadcastGameStateToPlayers(id)
+}
+
+/**
 * All Match-making Business Logic
 **/
 
@@ -30,13 +50,11 @@ func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 		var matchFull bool = false
 		fmt.Println("Length of match:", len(match))
 
-		// match is "full" is length of match has reached 2
+		// match is "full" is when the length of match has reached 2
 		matchFull = len(match) == 2
 
 		// join match if not full
 		if !matchFull {
-
-			// s.matches[matchId].Players = append(s.matches[matchId].Players, player)
 			game.JoinGame(&player)
 
 			// end search
@@ -52,26 +70,6 @@ func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 	s.matches[newGame.ID] = newGame
 
 	return newGame.ID
-}
-
-/**
-* Wrapper function for goroutine to find a match and respond the client(s) with the game state.
-**/
-func (s *MultiplayerServer) findMatchAndBroadcast(p models.Player) {
-	// handles communication match find results
-	matchFindChan := make(chan uuid.UUID)
-
-	// find the match concurrently, sending to the channel once it's done
-	go func() {
-		id := s.findMatch(p)
-		matchFindChan <- id
-	}()
-
-	// wait until match is found
-	id := <-matchFindChan
-
-	// broadcast to all users participating in the match
-	s.broadcastGameStateToPlayers(id)
 }
 
 /**

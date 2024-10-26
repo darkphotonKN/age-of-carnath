@@ -1,7 +1,7 @@
 "use client";
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/Button";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useWebsocketStore } from "@/stores/websocketStore";
 
@@ -20,21 +20,19 @@ export default function MainMenu() {
     setInitFindMatch(true);
   }
 
-  useEffect(() => {
-    console.log("[@Home page] ws:", ws);
-    if (initFindMatch && ws && ws.readyState === WebSocket.OPEN) {
-      // init matchmaking
-      const player = {
-        id: uuidv4(),
-        name: "test first ever player",
-      };
+  console.log("[@Home page] ws:", ws);
+  if (initFindMatch && ws && ws.readyState === WebSocket.OPEN) {
+    // init matchmaking
+    const player = {
+      id: uuidv4(),
+      name: "test first ever player",
+    };
 
-      startMatchmaking(player);
+    startMatchmaking(player);
 
-      // route to the match page
-      router.push("/game");
-    }
-  }, [ws, ws?.readyState]);
+    // route to the match page
+    router.push("/game");
+  }
 
   return (
     <div className="flex flex-col justify-center items-center h-full">
