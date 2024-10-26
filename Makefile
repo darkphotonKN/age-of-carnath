@@ -13,6 +13,9 @@ build:
 run: build
 	@./bin/game-server
 
+dev:
+	@air
+
 # Run tests with verbose output and coverage
 test:
 	@go test ./... -cover

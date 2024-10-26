@@ -85,7 +85,7 @@ func (s *MultiplayerServer) broadcastGameStateToPlayers(matchId uuid.UUID) {
 		for conn, client := range s.clientConns {
 			if player.ID == client.ID {
 				conn.WriteJSON(GameMessage{
-					Action:  find_match,
+					Action:  init_match,
 					Payload: *gameState,
 				})
 			}

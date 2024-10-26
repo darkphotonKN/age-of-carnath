@@ -2,6 +2,7 @@ type EnumValue<T> = T[keyof T];
 
 export const GameAction = {
   FIND_MATCH: "find_match",
+  INIT_MATCH: "init_match",
   MOVE: "move",
   ATTACK: "attack",
 } as const;

@@ -9,6 +9,11 @@ import (
 	"github.com/google/uuid"
 )
 
+const (
+	maxGridRows uint8 = 20
+	maxGridCols uint8 = 20
+)
+
 /**
 * Holds all grid and game information for a **single** match.
 **/
@@ -86,7 +91,7 @@ func NewGame(gridRows uint8, gridCols uint8) *Game {
 * Initalizes a game with a initial player.
 **/
 func InitializeGame(player *models.Player) *Game {
-	newGame := NewGame(30, 50)
+	newGame := NewGame(maxGridRows, maxGridCols)
 	newGame.SpawnPlayerOnGrid(player)
 	return newGame
 }

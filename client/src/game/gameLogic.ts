@@ -1,9 +1,11 @@
-import { GridState, Position } from "./types";
+import { useWebsocketStore } from "@/stores/websocketStore";
+import { GamePayload, GridState, Position } from "./types";
 import {
   XDirection,
   YDirection,
   XDirectionEnum,
   YDirectionEnum,
+  GameAction,
 } from "@/constants/enums";
 
 /**
@@ -228,4 +230,25 @@ export function clearGridStateHighlighting(gridState: GridState) {
       gridBlock.highlight = false;
     });
   });
+}
+
+/**
+ * Determines Action based on Game Action and Payload from server.
+ **/
+export function deduceGameAction<T>(gamePayload: GamePayload<T>) {
+  const setFindingMatch = useWebsocketStore.getState().setFindingMatch;
+  console.log("gamePayload action:", gamePayload.action);
+
+  switch (gamePayload.action) {
+    case GameAction.INIT_MATCH: {
+      console.log("Initiating match...");
+      setTimeout(() => {
+        // end match making wait
+        setFindingMatch(false);
+
+        // route to game
+        window.location.href = "/game";
+      }, 3000);
+    }
+  }
 }

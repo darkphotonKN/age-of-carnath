@@ -1,13 +1,16 @@
 import { GameAction } from "@/constants/enums";
+import { deduceGameAction } from "@/game/gameLogic";
 import { GamePayload, Player } from "@/game/types";
 import { create } from "zustand";
 
 type WebSocketState = {
   ws: WebSocket | null;
   isConnected: boolean;
+  findingMatch: boolean;
   setupWebSocket: () => void;
   setWebSocket: (ws: WebSocket) => void;
   setConnectionStatus: (status: boolean) => void;
+  setFindingMatch: (finding: boolean) => void;
   sendMessage: <T>(payload: GamePayload<T>) => void;
   startMatchmaking: (player: Player) => void;
   closeConnection: () => void;
@@ -22,6 +25,7 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
   // -- State Variables --
   ws: null,
   isConnected: false,
+  findingMatch: false,
 
   // -- State Methods --
   /**
@@ -54,6 +58,8 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
       const serverMsgJson = JSON.parse(event.data);
 
       console.log("JSON from server:", serverMsgJson);
+
+      deduceGameAction(serverMsgJson);
 
       if (typeof event.data === "string") {
         try {
@@ -89,6 +95,11 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
     }
   },
 
+  /**
+   * Sets the current state of the matchmaking process.
+   **/
+  setFindingMatch: (finding) => set({ findingMatch: finding }),
+
   // --- Helper Methods --
 
   /**
@@ -96,11 +107,15 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
    * Wraps the logic of creating the message and calling sendMessage.
    **/
   startMatchmaking: (player: Player) => {
+    console.log("STARTING MATCHMAKING with player:", player);
+    // let the client know matchmaking has started
+    get().findingMatch = true;
+
+    // initiate match making on the game server
     const payload: GamePayload<Player> = {
       action: GameAction.FIND_MATCH,
       payload: player,
     };
-
     get().sendMessage(payload);
   },
 
