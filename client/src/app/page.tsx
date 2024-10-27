@@ -2,8 +2,10 @@
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/Button";
 import { useWebsocketStore } from "@/stores/websocketStore";
+import { useState } from "react";
 
 export default function MainMenu() {
+  const [matchStart, setMatchStart] = useState(false);
   // connect to websocket state store
   const { ws, setupWebSocket, startMatchmaking, findingMatch } =
     useWebsocketStore();
@@ -13,14 +15,18 @@ export default function MainMenu() {
     setupWebSocket();
   }
 
-  if (ws && ws.readyState === WebSocket.OPEN) {
+  if (!matchStart && ws && ws.readyState === WebSocket.OPEN) {
+    const id = uuidv4();
+    console.log("re-initializing id:", id);
     // init matchmaking
     const player = {
-      id: uuidv4(),
+      id,
       name: "test first ever player",
     };
 
     startMatchmaking(player);
+
+    setMatchStart(true);
   }
 
   return (

@@ -53,12 +53,13 @@ func NewMultiplayerServer(listenAddr string) *MultiplayerServer {
 	}
 
 	return &MultiplayerServer{
-		ListenAddr:  listenAddr,
-		upgrader:    upgrader,
-		players:     make(map[string]models.Player, player_limit),
-		clientConns: make(map[*websocket.Conn]models.Player, player_limit),
-		matches:     make(map[uuid.UUID]*game.Game),
-		serverChan:  make(chan ClientPackage),
+		ListenAddr:       listenAddr,
+		upgrader:         upgrader,
+		players:          make(map[string]models.Player, player_limit),
+		clientConns:      make(map[*websocket.Conn]models.Player, player_limit),
+		gameMessageChans: make(map[*websocket.Conn]chan GameMessage),
+		matches:          make(map[uuid.UUID]*game.Game),
+		serverChan:       make(chan ClientPackage),
 	}
 }
 

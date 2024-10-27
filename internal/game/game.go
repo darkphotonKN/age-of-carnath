@@ -125,7 +125,7 @@ func initializeGrid(rows uint8, cols uint8) GridState {
 * Spawns player randomly on the map.
 **/
 func (g *Game) SpawnPlayerOnGrid(p *models.Player) {
-	fmt.Printf("Attempting %s to SPAWN game.", p.Name)
+	fmt.Printf("Attempting %s to SPAWN game.\n", p.Name)
 	// NOTE: prevent race conditions if two players happen to spawn
 	// at the same time to access the same resources
 
@@ -133,7 +133,7 @@ func (g *Game) SpawnPlayerOnGrid(p *models.Player) {
 
 	// Generate a random number between 0 and length of rows (y) (inclusive)
 	randomY := r.Intn(len(g.GridState))
-	fmt.Println("Random spawn row, y coord:\n", randomY)
+	fmt.Println("Random spawn row, y coord:", randomY)
 
 	// Generates a random number between 0 and the length of columns (x), (inclusive)
 	randomX := r.Intn(len(g.GridState[0]))

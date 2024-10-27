@@ -6,7 +6,6 @@ import (
 	"github.com/darkphotonKN/age-of-carnath/internal/game"
 	"github.com/darkphotonKN/age-of-carnath/internal/models"
 	"github.com/google/uuid"
-	"github.com/gorilla/websocket"
 )
 
 /**
@@ -35,7 +34,10 @@ func (s *MultiplayerServer) findMatchAndBroadcast(p models.Player) {
 
 /**
 * Helps find a match for the player.
-* TODO: For v1.1: Add matchmaking algorithm.
+* TODO:
+* 1) Fix close error for client (1001 going away).
+* 2) Only allow init match once the game is full, otherwise let client wait.
+* 3) For v1.1: Add matchmaking algorithm.
 **/
 func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 	// maps are not thread-safe, adding locking incase match was removed / altered
@@ -98,62 +100,6 @@ func (s *MultiplayerServer) broadcastGameStateToPlayers(matchId uuid.UUID) {
 			}
 		}
 	}
-}
-
-/**
-* Handles adding clients and creating gameMsgChans for handling connection writes
-* back to the connected client.
-**/
-func (s *MultiplayerServer) setupClientWriter(conn *websocket.Conn) {
-	err := s.createGameMsgChan(conn)
-
-	if err != nil {
-		fmt.Printf("Error when attempting to creating client writer: %s\n", err)
-		return
-	}
-
-	// in the case the channel exists
-	if msgChan := s.getGameMsgChan(conn); msgChan != nil {
-
-		// concurrently listen to all incoming messages over the channel to write back to client
-		go func() {
-			for msg := range msgChan {
-				err := conn.WriteJSON(msg)
-
-				if err != nil {
-					// TODO: remove connection from channel and close
-					s.cleanUpClient(conn)
-					break
-				}
-			}
-		}()
-	}
-}
-
-/**
-* Cleans up both clients and client writer.
-**/
-func (s *MultiplayerServer) cleanUpClient(conn *websocket.Conn) {
-	// NOTE: keep mutex due to multiple concurrent access to global resources
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	_, ok := s.clientConns[conn]
-
-	// end prematurely due to client already removed / missing
-	if !ok {
-		return
-	}
-
-	// close channel
-	msgChan := s.getGameMsgChan(conn)
-	close(msgChan)
-
-	// remove msgChan from list of game message channels
-	delete(s.gameMessageChans, conn)
-
-	// remove from list of clients
-	delete(s.clientConns, conn)
 }
 
 // --- Helpers ---

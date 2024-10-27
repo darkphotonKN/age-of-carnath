@@ -49,9 +49,6 @@ func (s *MultiplayerServer) MessageHub() {
 				// add client to global struct connections pool
 				s.addClient(clientPackage.Conn, player)
 
-				// handle concurrent writes back to clients
-				s.setupClientWriter(clientPackage.Conn)
-
 				// initiating matchmaking for the player concurrently
 				go s.findMatchAndBroadcast(player)
 			}
