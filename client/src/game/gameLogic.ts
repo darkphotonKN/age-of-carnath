@@ -242,13 +242,11 @@ export function deduceGameAction<T>(gamePayload: GamePayload<T>) {
   switch (gamePayload.action) {
     case GameAction.INIT_MATCH: {
       console.log("Initiating match...");
-      setTimeout(() => {
-        // end match making wait
-        setFindingMatch(false);
+      // end match making wait
+      setFindingMatch(false);
 
-        // route to game
-        window.location.href = "/game";
-      }, 3000);
+      // route to game
+      window.location.href = "/game";
     }
   }
 }

@@ -37,7 +37,7 @@ func (s *MultiplayerServer) findMatchAndBroadcast(p models.Player) {
 * TODO: For v1.1: Add matchmaking algorithm.
 **/
 func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
-	// maps are not thread-safe, can add locking to be sure incase match was removed / altered
+	// maps are not thread-safe, adding locking incase match was removed / altered
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -81,13 +81,18 @@ func (s *MultiplayerServer) broadcastGameStateToPlayers(matchId uuid.UUID) {
 
 	// loop through all players of the game and find corresponding
 	// client's websocket connection to broadcast
+	// NOTE: If multiple goroutines try to write to the same connection at the same time,
+	// this can cause data races or undefined behavior.
 	for _, player := range gameState.Players {
 		for conn, client := range s.clientConns {
+			// lock write
 			if player.ID == client.ID {
+				s.mu.Lock()
 				conn.WriteJSON(GameMessage{
 					Action:  init_match,
 					Payload: *gameState,
 				})
+				s.mu.Unlock()
 			}
 		}
 	}

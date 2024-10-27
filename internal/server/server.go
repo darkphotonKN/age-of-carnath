@@ -1,6 +1,7 @@
 package server
 
 import (
+	"fmt"
 	"net/http"
 	"sync"
 
@@ -33,6 +34,9 @@ type MultiplayerServer struct {
 	// All currently connected players from all on-going match connections
 	clientConns map[*websocket.Conn]models.Player
 
+	// Communication for each game - MAP of channels of GameMessage
+	gameMessageChans map[*websocket.Conn]chan GameMessage
+
 	// All ongoing matches
 	// NOTE: self-reminder - maintain this as a map for O(1) performance in finding matches
 	matches    map[uuid.UUID]*game.Game
@@ -56,4 +60,42 @@ func NewMultiplayerServer(listenAddr string) *MultiplayerServer {
 		matches:     make(map[uuid.UUID]*game.Game),
 		serverChan:  make(chan ClientPackage),
 	}
+}
+
+// --- Helpers ---
+
+/**
+* Thread-safe lock-unlock access of the game message channels used for writing
+* back to clients.
+*
+**/
+func (s *MultiplayerServer) getGameMsgChan(conn *websocket.Conn) chan GameMessage {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	channel, exists := s.gameMessageChans[conn]
+
+	if exists {
+		return channel
+	}
+
+	return nil
+}
+
+/**
+* Creates a game message channel if it doesn't exist
+**/
+func (s *MultiplayerServer) createGameMsgChan(conn *websocket.Conn) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	_, exists := s.gameMessageChans[conn]
+
+	if exists {
+		return fmt.Errorf("Game message channel already exist.")
+	}
+
+	// create channel and add it to the map
+	newChan := make(chan GameMessage)
+	s.gameMessageChans[conn] = newChan
+
+	return nil
 }
