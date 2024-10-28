@@ -7,12 +7,14 @@ type WebSocketState = {
   ws: WebSocket | null;
   isConnected: boolean;
   findingMatch: boolean;
+  matchInitiated: boolean;
   setupWebSocket: () => void;
   setWebSocket: (ws: WebSocket) => void;
   setConnectionStatus: (status: boolean) => void;
   setFindingMatch: (finding: boolean) => void;
   sendMessage: <T>(payload: GamePayload<T>) => void;
   startMatchmaking: (player: Player) => void;
+  setMatchInitiated: (initiated: boolean) => void;
   closeConnection: () => void;
 };
 
@@ -26,6 +28,7 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
   ws: null,
   isConnected: false,
   findingMatch: false,
+  matchInitiated: false,
 
   // -- State Methods --
   /**
@@ -42,6 +45,7 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
     if (get().ws) return;
 
     const socket = new WebSocket(`ws://localhost:4111/ws`);
+    console.log("@WS creating websocket instance:", socket);
 
     socket.onopen = (event) => {
       console.log("Connection Server Info on Open:", event);
@@ -80,6 +84,12 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
    * Can be used to track the connection state across the app.
    **/
   setConnectionStatus: (status) => set({ isConnected: status }),
+
+  /**
+   * Updates the MatchInitiated status.
+   * Used to determine whether or not a game has started for the client.
+   **/
+  setMatchInitiated: (initiated) => set({ matchInitiated: initiated }),
 
   /**
    * Sends a message to the WebSocket server.

@@ -237,16 +237,18 @@ export function clearGridStateHighlighting(gridState: GridState) {
  **/
 export function deduceGameAction<T>(gamePayload: GamePayload<T>) {
   const setFindingMatch = useWebsocketStore.getState().setFindingMatch;
+  const setMatchInitiated = useWebsocketStore.getState().setMatchInitiated;
   console.log("gamePayload action:", gamePayload.action);
 
   switch (gamePayload.action) {
     case GameAction.INIT_MATCH: {
       console.log("Initiating match...");
+
       // end match making wait
       setFindingMatch(false);
 
-      // route to game
-      window.location.href = "/game";
+      // signal match has started
+      setMatchInitiated(true);
     }
   }
 }

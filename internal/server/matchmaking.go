@@ -35,7 +35,7 @@ func (s *MultiplayerServer) findMatchAndBroadcast(p models.Player) {
 /**
 * Helps find a match for the player.
 * TODO:
-* 1) Fix close error for client (1001 going away).
+* 1) Fix close error for client (1001 going away). DONE
 * 2) Only allow init match once the game is full, otherwise matchmaking should be pending.
 * 3) For v1.1: Add matchmaking algorithm.
 **/
