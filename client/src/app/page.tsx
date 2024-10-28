@@ -2,29 +2,37 @@
 import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/Button";
 import { useWebsocketStore } from "@/stores/websocketStore";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function MainMenu() {
   const [matchStart, setMatchStart] = useState(false);
+
   // connect to websocket state store
-  const { ws, setupWebSocket, startMatchmaking, findingMatch } =
+  const { ws, setupWebSocket, startMatchmaking, findingMatch, isConnected } =
     useWebsocketStore();
 
   // -- Handle Finding a Match function and useEffect --
+  useEffect(() => {
+    // NOTE: useEffect is warranted here alright u snoopers, useEffect
+    // is designed for interacting with EXTERNAL systems - in this case our
+    // websocket server.
+
+    if (matchStart && isConnected) {
+      const id = uuidv4();
+      // init matchmaking
+      // TODO: remove test player
+      const player = {
+        id,
+        name: "test first ever player",
+      };
+      startMatchmaking(player);
+    }
+  }, [matchStart, startMatchmaking, isConnected]);
+
   function handleInitFindMatch() {
-    setupWebSocket();
-  }
-
-  if (!matchStart && ws && ws.readyState === WebSocket.OPEN) {
-    const id = uuidv4();
-    console.log("re-initializing id:", id);
-    // init matchmaking
-    const player = {
-      id,
-      name: "test first ever player",
-    };
-
-    startMatchmaking(player);
+    if (!ws) {
+      setupWebSocket();
+    }
 
     setMatchStart(true);
   }

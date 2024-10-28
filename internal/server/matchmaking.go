@@ -36,7 +36,7 @@ func (s *MultiplayerServer) findMatchAndBroadcast(p models.Player) {
 * Helps find a match for the player.
 * TODO:
 * 1) Fix close error for client (1001 going away).
-* 2) Only allow init match once the game is full, otherwise let client wait.
+* 2) Only allow init match once the game is full, otherwise matchmaking should be pending.
 * 3) For v1.1: Add matchmaking algorithm.
 **/
 func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
@@ -79,7 +79,8 @@ func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 * Broadcasts current game state to all players of a particular match.
 **/
 func (s *MultiplayerServer) broadcastGameStateToPlayers(matchId uuid.UUID) {
-	// TODO: Refactor to include better way of access player connections.
+	// TODO: Refactor MultiplayerServer struct to include info
+	// for simpler way of accessing player connections.
 	gameState := s.matches[matchId]
 
 	// loop through all players of the game and find corresponding

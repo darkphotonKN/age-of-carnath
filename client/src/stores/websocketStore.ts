@@ -46,18 +46,17 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
     socket.onopen = (event) => {
       console.log("Connection Server Info on Open:", event);
       get().setWebSocket(socket);
+      get().setConnectionStatus(true);
     };
 
     socket.onerror = (error) => {
-      console.log("WebSocket error:", error);
+      console.log("@WS WebSocket error:", error);
     };
 
     socket.onmessage = (event) => {
-      console.log("Received from Server:", event.data);
-
       const serverMsgJson = JSON.parse(event.data);
 
-      console.log("JSON from server:", serverMsgJson);
+      console.log("@WS JSON from server:", serverMsgJson);
 
       deduceGameAction(serverMsgJson);
 
@@ -72,7 +71,7 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
     };
 
     socket.onclose = () => {
-      console.log("Disconnected from WebSocket server.");
+      console.log("@WS Disconnected from WebSocket server.");
     };
   },
 
@@ -107,7 +106,7 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
    * Wraps the logic of creating the message and calling sendMessage.
    **/
   startMatchmaking: (player: Player) => {
-    console.log("STARTING MATCHMAKING with player:", player);
+    console.log("@MATCHMAKING starting match player:", player);
     // let the client know matchmaking has started
     get().findingMatch = true;
 
@@ -123,7 +122,7 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
    * Performs a clean up for the websocket connection and the current websocket instance.
    **/
   closeConnection: () => {
-    console.log("cleaning up");
+    console.log("@MATCHMAKING @WS cleaning up");
     // close connetion
     get().ws?.close();
 

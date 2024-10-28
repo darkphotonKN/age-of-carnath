@@ -54,15 +54,21 @@ func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
 		_, message, err := conn.ReadMessage()
 
 		if err != nil {
-			// -- clean up connection --
+			// --- clean up connection ---
 
-			// handle error - if error is of type thats an unknown error
-			// that matches the two types listed, we close return the loop and
-			// close it immediately (via the defer)
+			// Unexpected Error
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				fmt.Printf("Abormal error occured with player %v. Closing connection.\n", s.clientConns[conn])
+				break
 			}
 
+			// Close Error
+			if websocket.IsCloseError(err, websocket.CloseGoingAway) {
+				fmt.Printf("Error on close, close going away, error: %s\n", err)
+				break
+			}
+
+			// General Error
 			fmt.Printf("General error occured during connection: %s\n", err)
 			break
 		}

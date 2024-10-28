@@ -73,6 +73,6 @@ func printOngoingMatches(matches map[uuid.UUID]*game.Game) {
 			}
 		}
 
-		fmt.Printf("Match %s\nplayers: %+v\nNon-Empty GridState: %+v\n\n", id, match.Players, nonEmptyGrid)
+		fmt.Printf("Match Info:%s\nMatch Players: %+v\nMatch Occupied GridState: %+v\n------------------------------\n\n", id, match.Players, nonEmptyGrid)
 	}
 }
