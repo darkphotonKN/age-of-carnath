@@ -5,6 +5,7 @@ import { GridState, Player, Position } from "@/game/types";
 import { ContentType } from "@/constants/enums";
 import { clearGridStateHighlighting, highlightPath } from "@/game/gameLogic";
 import { TooltipProps } from "../Tooltip";
+import { useWebsocketStore } from "@/stores/websocketStore";
 
 /**
  * GameGrid Component
@@ -15,54 +16,29 @@ import { TooltipProps } from "../Tooltip";
  * Local state grid is used to render things for temporary visual purposes.
  **/
 function GameGrid() {
+  const { gameState } = useWebsocketStore();
   const [gridState, setGridState] = useState<GridState>();
   const [currentPlayer, setCurrentPlayer] = useState<Player>();
   const [currentTarget, setCurrentTarget] = useState<TooltipProps>();
 
   useEffect(() => {
-    // TODO: Update to real grid
-    const COL_SIZE = 24;
-    const ROW_SIZE = 16;
+    const { gridState, players } = gameState || {};
+    console.log("@WS gridState from server:", gameState);
+    console.log("@WS players in match from server:", gameState);
 
-    const mockGrid: GridState = [];
+    // TODO: Make grid state conform to the frontend version.
+    setGridState(gridState);
 
-    // creating mock data
-    for (let row = 0; row < ROW_SIZE; row++) {
-      // initialize new row
-      mockGrid[row] = [];
-
-      for (let col = 0; col < COL_SIZE; col++) {
-        mockGrid[row][col] = {
-          contentType: ContentType.EMPTY,
-          position: { x: col, y: row },
-        };
-      }
-    }
-
-    // adding mock player
-    const mockPlayer = {
-      id: "123",
-      name: "Mock player",
-    };
-    const mockXCoord = 12;
-    const mockYCoord = 6;
-
-    mockGrid[mockYCoord][mockXCoord] = {
-      contentType: ContentType.PLAYER,
-      position: {
-        x: mockXCoord,
-        y: mockYCoord,
-      },
-      content: mockPlayer,
+    //TODO: Update to real authenticated player.
+    const player = {
+      id: "5f77878d-a770-4729-b8d2-90ac1b6296d3",
+      name: "Next Client Player",
     };
 
-    setGridState(mockGrid);
-
-    // TODO: load player's character as the current state
-    setCurrentPlayer(mockPlayer);
-
-    // TODO: load server grid state into local grid state
+    setCurrentPlayer(player);
   }, []);
+
+  console.log("@WS gridState client:", gridState);
 
   /**
    * Find the position of the current client's own character player based on ID
@@ -76,7 +52,7 @@ function GameGrid() {
     for (let y = 0; y < gridState.length; y++) {
       // searching x (columns)
       for (let x = 0; x < gridState[y].length; x++) {
-        if (gridState[y][x]?.content?.id === currentPlayer.id) {
+        if (gridState[y][x]?.content?.player?.id === currentPlayer.id) {
           // found player
           return {
             x,

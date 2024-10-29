@@ -10,8 +10,8 @@ import (
 )
 
 const (
-	maxGridRows uint8 = 20
-	maxGridCols uint8 = 20
+	maxGridRows uint8 = 10
+	maxGridCols uint8 = 15
 )
 
 /**
@@ -22,10 +22,10 @@ type Game struct {
 	ID uuid.UUID
 
 	// holds all the game's grid information
-	GridState GridState
+	GridState GridState `json:"gridState"`
 
 	// contains the match's players. NOTE: (max length 2)
-	Players []models.Player
+	Players []models.Player `json:"players"`
 }
 
 /**
@@ -69,7 +69,7 @@ type Content struct {
 type GridBlock struct {
 	Position    Position    `json:"position"`
 	ContentType ContentType `json:"contentType"`
-	Content     Content     `json:"content"`
+	Content     *Content    `json:"content,omitempty"`
 }
 
 /**
@@ -142,7 +142,7 @@ func (g *Game) SpawnPlayerOnGrid(p *models.Player) {
 	g.GridState[randomY][randomX] = GridBlock{
 		Position:    Position{x: uint8(randomX), y: uint8(randomY)},
 		ContentType: PlayerType,
-		Content:     Content{Player: p},
+		Content:     &Content{Player: p},
 	}
 
 	// adds player to list of players
@@ -178,7 +178,7 @@ func (g *Game) JoinGame(p *models.Player) {
 	g.GridState[randomY][randomX] = GridBlock{
 		Position:    Position{x: uint8(0), y: uint8(0)},
 		ContentType: PlayerType,
-		Content:     Content{Player: p},
+		Content:     &Content{Player: p},
 	}
 	g.Players = append(g.Players, *p)
 

@@ -6,6 +6,12 @@ export type GamePayload<T> = {
   payload: T;
 };
 
+// general game information, matches server's
+export type GameState = {
+  gridState: GridBlock[][];
+  players: Player[];
+};
+
 export type Player = {
   id: string;
   name: string;
@@ -16,6 +22,11 @@ export type Item = {
   label: string;
 };
 
+export type Content = {
+  player?: Player;
+  item?: Item;
+};
+
 export type Position = {
   x: number;
   y: number;
@@ -24,7 +35,7 @@ export type Position = {
 export type GridBlock = {
   contentType: ContentTypeEnum;
   position: Position;
-  content?: Player | Item;
+  content?: Content;
   highlight?: boolean;
 };
 

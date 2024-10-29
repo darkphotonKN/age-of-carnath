@@ -82,7 +82,7 @@ func Test_SpawnPlayerOnGrid(t *testing.T) {
 	for _, row := range game.GridState {
 		for _, block := range row {
 			// can check for nil, as its a pointer
-			if block.Content.Player != nil && block.Content.Player.ID == playerId {
+			if block.Content != nil && block.Content.Player != nil && block.Content.Player.ID == playerId {
 
 				fmt.Printf("PLAYER EXISTS!!! Player: %+v\n\n", block)
 				playerExists = true
@@ -129,7 +129,7 @@ func Test_JoinGame(t *testing.T) {
 	for _, row := range game.GridState {
 		for _, block := range row {
 			// can check for nil, as its a pointer
-			if block.Content.Player != nil && block.Content.Player.ID == playerId {
+			if block.Content != nil && block.Content.Player != nil && block.Content.Player.ID == playerId {
 
 				fmt.Printf("PLAYER EXISTS!!! Player: %+v\n\n", block)
 				playerExists = true

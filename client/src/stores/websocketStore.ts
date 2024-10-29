@@ -1,15 +1,17 @@
 import { GameAction } from "@/constants/enums";
 import { deduceGameAction } from "@/game/gameLogic";
-import { GamePayload, Player } from "@/game/types";
+import { GamePayload, GameState, Player } from "@/game/types";
 import { create } from "zustand";
 
 type WebSocketState = {
   ws: WebSocket | null;
+  gameState: GameState | null;
   isConnected: boolean;
   findingMatch: boolean;
   matchInitiated: boolean;
   setupWebSocket: () => void;
   setWebSocket: (ws: WebSocket) => void;
+  setGameState: (gameState: GameState) => void;
   setConnectionStatus: (status: boolean) => void;
   setFindingMatch: (finding: boolean) => void;
   sendMessage: <T>(payload: GamePayload<T>) => void;
@@ -26,6 +28,7 @@ type WebSocketState = {
 export const useWebsocketStore = create<WebSocketState>((set, get) => ({
   // -- State Variables --
   ws: null,
+  gameState: null,
   isConnected: false,
   findingMatch: false,
   matchInitiated: false,
@@ -63,21 +66,18 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
       console.log("@WS JSON from server:", serverMsgJson);
 
       deduceGameAction(serverMsgJson);
-
-      if (typeof event.data === "string") {
-        try {
-          const message = JSON.parse(event.data);
-          console.log("message received:", message);
-        } catch (error) {
-          console.log("Failed to parse incoming message:", error);
-        }
-      }
     };
 
     socket.onclose = () => {
       console.log("@WS Disconnected from WebSocket server.");
     };
   },
+
+  /**
+   * Sets up gameState in zustand store as the single source of truth of the state of any match.
+   **/
+
+  setGameState: (gameState: GameState) => set({ gameState }),
 
   /**
    * Updates the WebSocket connection status.
@@ -133,10 +133,16 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
    **/
   closeConnection: () => {
     console.log("@MATCHMAKING @WS cleaning up");
-    // close connetion
+    // close connection
     get().ws?.close();
 
     // reset ws instance
     set({ ws: null });
+
+    // close connection status
+    get().setConnectionStatus(false);
+
+    // stop match
+    get().setMatchInitiated(false);
   },
 }));

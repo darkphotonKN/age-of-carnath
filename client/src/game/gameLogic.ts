@@ -1,5 +1,5 @@
 import { useWebsocketStore } from "@/stores/websocketStore";
-import { GamePayload, GridState, Position } from "./types";
+import { GamePayload, GameState, GridState, Position } from "./types";
 import {
   XDirection,
   YDirection,
@@ -7,6 +7,10 @@ import {
   YDirectionEnum,
   GameAction,
 } from "@/constants/enums";
+
+/**
+ * Formats grid from server gridState for render.
+ **/
 
 /**
  * Handles highlighting action between the player and the board.
@@ -238,6 +242,8 @@ export function clearGridStateHighlighting(gridState: GridState) {
 export function deduceGameAction<T>(gamePayload: GamePayload<T>) {
   const setFindingMatch = useWebsocketStore.getState().setFindingMatch;
   const setMatchInitiated = useWebsocketStore.getState().setMatchInitiated;
+  const setGameState = useWebsocketStore.getState().setGameState;
+
   console.log("gamePayload action:", gamePayload.action);
 
   switch (gamePayload.action) {
@@ -249,6 +255,10 @@ export function deduceGameAction<T>(gamePayload: GamePayload<T>) {
 
       // signal match has started
       setMatchInitiated(true);
+
+      // parse payload and set to store
+      const serverGameState = gamePayload.payload as GameState;
+      setGameState(serverGameState);
     }
   }
 }

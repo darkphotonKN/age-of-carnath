@@ -5,12 +5,13 @@ import { useWebsocketStore } from "@/stores/websocketStore";
 import { useEffect } from "react";
 
 export default function Game() {
-  // connect to websocket state store
-  const { ws } = useWebsocketStore();
+  // const { closeConnection } = useWebsocketStore();
 
   useEffect(() => {
-    console.log("[@Game page] ws:", ws);
-    // clean up when leaving game in any way
+    // TODO: clean up when leaving game in any way
+    return () => {
+      // closeConnection();
+    };
   }, []);
 
   return (

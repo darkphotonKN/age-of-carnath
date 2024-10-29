@@ -19,28 +19,27 @@ export default function MainMenu() {
     matchInitiated,
   } = useWebsocketStore();
 
-  // -- Handle Finding a Match function and useEffect --
+  // -- Handle Finding a Match --
   useEffect(() => {
     console.log(`@WS matchStart: ${matchStart} isConnected: ${isConnected}`);
     if (matchStart && isConnected) {
-      const id = uuidv4();
       // init matchmaking
       // TODO: Add actual authenticated player.
       const player = {
-        id,
+        id: "5f77878d-a770-4729-b8d2-90ac1b6296d3",
         name: "test first ever player",
       };
 
       startMatchmaking(player);
     }
-  }, [matchStart, startMatchmaking, isConnected]);
+  }, [matchStart, isConnected]);
 
+  // route to game page after game successfully inits.
   useEffect(() => {
-    // route to game page after game successfully inits.
     if (matchInitiated) {
       router.push("/game");
     }
-  }, [router, matchInitiated]);
+  }, [matchInitiated]);
 
   function handleInitFindMatch() {
     if (!ws) {
