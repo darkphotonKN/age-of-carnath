@@ -127,7 +127,7 @@ func TestNewMultiplayerServer_FindMatch_Full(t *testing.T) {
 	assert.Equal(t, expectedPrint, actualPrint)
 }
 
-// -- Multiple player joins via findMatch Test --
+// -- Testing Multiple player joins via findMatch --
 func TestNewMultiplayerServer_FindMatch_Multiple(t *testing.T) {
 	fmt.Println("Testing Find Match --- Multiple Matches")
 	testMultiplayerServer := NewMultiplayerServer(":3636")
