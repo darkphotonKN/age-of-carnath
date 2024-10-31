@@ -1,5 +1,4 @@
 "use client";
-import { v4 as uuidv4 } from "uuid";
 import { Button } from "@/components/Button";
 import { useWebsocketStore } from "@/stores/websocketStore";
 import { useEffect, useState } from "react";
@@ -48,6 +47,8 @@ export default function MainMenu() {
 
     setMatchStart(true);
   }
+
+  console.log("@WS findingMatch:", findingMatch);
 
   return (
     <div className="flex flex-col justify-center items-center h-full">

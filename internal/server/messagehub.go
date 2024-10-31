@@ -34,7 +34,7 @@ func (s *MultiplayerServer) MessageHub() {
 			}
 
 			switch clientPackage.GameMessage.Action {
-			case "find_match":
+			case find_match:
 				fmt.Println("Inside 'find match' case, payload:", clientPackage.GameMessage.Payload)
 
 				// assert Payload type specific to gameMessage.Action == "find_match", which is Player
@@ -51,6 +51,10 @@ func (s *MultiplayerServer) MessageHub() {
 
 				// initiating matchmaking for the player concurrently
 				go s.findMatchAndBroadcast(player)
+
+			// TODO: Handle the case wher eclient is trying to move on their turn.
+			case move:
+
 			}
 		}
 	}

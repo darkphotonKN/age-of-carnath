@@ -46,7 +46,6 @@ func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 
 	// loop through current matches and find an opponent still waiting
 	for matchId, game := range s.matches {
-
 		match := game.Players
 
 		// check length of match to know if its full

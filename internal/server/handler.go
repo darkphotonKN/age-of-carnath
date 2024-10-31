@@ -37,9 +37,6 @@ func (s *MultiplayerServer) HandleMatchConn(c *gin.Context) {
 
 /**
 * Serves each individual connected player.
-* NOTE: Gorilla Websocket package only allows ONE CONCURRENT WRITER
-* at a time, meaning its best to utilize *unbuffered* channels to prevent
-* a single client from locking the entire server.
 **/
 
 func (s *MultiplayerServer) ServeConnectedPlayer(conn *websocket.Conn) {
@@ -146,6 +143,10 @@ func (s *MultiplayerServer) StopMatch(playerId uuid.UUID) error {
 /**
 * Handles adding clients and creating gameMsgChans for handling connection writes
 * back to the connected client.
+*
+* NOTE: Gorilla Websocket package only allows ONE CONCURRENT WRITER
+* at a time, meaning its best to utilize *unbuffered* channels to prevent
+* a single client from locking the entire server.
 **/
 func (s *MultiplayerServer) setupClientWriter(conn *websocket.Conn) {
 	err := s.createGameMsgChan(conn)
@@ -157,13 +158,13 @@ func (s *MultiplayerServer) setupClientWriter(conn *websocket.Conn) {
 
 	// in the case the channel exists
 	if msgChan := s.getGameMsgChan(conn); msgChan != nil {
-
 		// concurrently listen to all incoming messages over the channel to write game actions
 		// back to the client
 		go func() {
+			// reading from unbuffered channel to prevent more than one write
+			// a time from ANY single connection
 			for msg := range msgChan {
 				err := conn.WriteJSON(msg)
-
 				if err != nil {
 					// TODO: remove connection from channel and close
 					s.cleanUpClient(conn)

@@ -118,7 +118,7 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
   startMatchmaking: (player: Player) => {
     console.log("@MATCHMAKING starting match player:", player);
     // let the client know matchmaking has started
-    get().findingMatch = true;
+    get().setFindingMatch(true);
 
     // initiate match making on the game server
     const payload: GamePayload<Player> = {

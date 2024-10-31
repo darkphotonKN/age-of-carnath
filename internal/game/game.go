@@ -26,6 +26,9 @@ type Game struct {
 
 	// contains the match's players. NOTE: (max length 2)
 	Players []models.Player `json:"players"`
+
+	// Track whos turn it is
+	Turn models.Player
 }
 
 /**

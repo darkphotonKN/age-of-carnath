@@ -1,10 +1,14 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { EB_Garamond } from "next/font/google";
+import {
+  Crimson_Text,
+  // OG
+  EB_Garamond,
+} from "next/font/google";
 import NavBar from "@/components/Nav";
 
-const fontFamily = EB_Garamond({
-  weight: ["400", "500", "700"],
+const fontFamily = Crimson_Text({
+  weight: ["400", "700"],
   style: "normal",
   subsets: ["latin"],
 });

@@ -37,6 +37,7 @@ export function highlightPath(
   }
 
   // 1 -- check if already at target --
+
   if (x1 == x2 && y1 == y2) {
     return;
   }
