@@ -18,6 +18,7 @@ func NewUserHandler(service *UserService) *UserHandler {
 }
 
 func (h *UserHandler) SignUp(c *gin.Context) {
+
 	var signUpUser SignUpReq
 
 	err := c.ShouldBindJSON(&signUpUser)

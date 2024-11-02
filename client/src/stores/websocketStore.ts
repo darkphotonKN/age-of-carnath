@@ -9,6 +9,7 @@ type WebSocketState = {
   isConnected: boolean;
   findingMatch: boolean;
   matchInitiated: boolean;
+  matchErrored: string;
   setupWebSocket: () => void;
   setWebSocket: (ws: WebSocket) => void;
   setGameState: (gameState: GameState) => void;
@@ -17,6 +18,7 @@ type WebSocketState = {
   sendMessage: <T>(payload: GamePayload<T>) => void;
   startMatchmaking: (player: Player) => void;
   setMatchInitiated: (initiated: boolean) => void;
+  setMatchErrored: (msg: string) => void;
   closeConnection: () => void;
 };
 
@@ -32,6 +34,7 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
   isConnected: false,
   findingMatch: false,
   matchInitiated: false,
+  matchErrored: "",
 
   // -- State Methods --
   /**
@@ -90,6 +93,12 @@ export const useWebsocketStore = create<WebSocketState>((set, get) => ({
    * Used to determine whether or not a game has started for the client.
    **/
   setMatchInitiated: (initiated) => set({ matchInitiated: initiated }),
+
+  /**
+   * Updates the MatchErrored status.
+   * Used to determine if a match error was received from the game server.
+   **/
+  setMatchErrored: (msg) => set({ matchErrored: msg }),
 
   /**
    * Sends a message to the WebSocket server.

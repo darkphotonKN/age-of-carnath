@@ -12,12 +12,12 @@ import (
 /**
 * Wrapper function for goroutine to find a match and respond the client(s) with the game state.
 **/
-func (s *MultiplayerServer) findMatchAndBroadcast(p models.Player) {
+func (s *MultiplayerServer) findMatchAndBroadcast(player models.Player) {
 	// handles communication match find results
 	matchFindChan := make(chan uuid.UUID)
 
 	go func() {
-		id := s.findMatch(p)
+		id := s.findMatch(player)
 
 		matchFindChan <- id
 	}()
@@ -32,14 +32,17 @@ func (s *MultiplayerServer) findMatchAndBroadcast(p models.Player) {
 		// case that a ticker interval passed, increment and check on the ticker channel
 		case <-ticker.C:
 			secondsPassed += 1
-			fmt.Println("Seconds passed:", secondsPassed)
+			fmt.Println("Time passed (seconds):", secondsPassed)
 
 		// match found so broadcast info to all users participating in the match
 		case matchFoundId := <-matchFindChan:
+			fmt.Println("Game found.")
 			s.broadcastGameStateToPlayers(matchFoundId)
+			return
 
-			// timeout passed first so stop the matchfind
+			// timeout passed first so stop the match find, send error
 		case <-timeout:
+			s.sendMessageToPlayer(player, match_error, "Timeout when searching for match.")
 			return
 		}
 	}
@@ -58,13 +61,13 @@ func (s *MultiplayerServer) findMatchAndBroadcast(p models.Player) {
 * 3) For v1.1: Add matchmaking algorithm.
 **/
 func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
-	// maps are not thread-safe, adding locking incase match was removed / altered
-	s.mu.Lock()
-	defer s.mu.Unlock()
 
 	// loop through current matches and find an opponent still waiting
 	// keep looping until queue is over 2 minutes long
+	// search all matches for empty match
 	for matchId, game := range s.matches {
+		// maps are not thread-safe, adding locking incase match was removed / altered
+		s.mu.Lock()
 		match := game.Players
 
 		// check length of match to know if its full
@@ -81,56 +84,39 @@ func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 			// end search immediately
 			return matchId
 		}
+
+		s.mu.Unlock()
 	}
 
-	// iteration over, meaning all matches are full, create a new one
+	// after first iteration means there were no open games, create one
+	matchId := game.InitializeGame(&player)
 
-	// initalize a game
-	newGame := game.InitializeGame(&player)
+	var timeWaited time.Duration
 
-	s.matches[newGame.ID] = newGame
+	for {
+		if timeWaited >= time.Second*10 {
+			return uuid.Nil
+		}
 
-	return newGame.ID
+		// repeat check for game start every 3 seconds
+		waitTime := time.Second * 2
+		timeWaited = waitTime
+		time.Sleep(waitTime)
 
-	// // but only return once the game has been "filled up" (2 players)
-	// for {
-	// 	time.Sleep(time.Second * 2000)
-	//
-	// 	fmt.Printf("No of Players: %d\nMatch Players: %+v\n", len(s.matches[newGame.ID].Players), s.matches[newGame.ID].Players)
-	//
-	// 	if len(s.matches[newGame.ID].Players) == 2 {
-	// 		return newGame.ID
-	// 	}
-	// }
+		match, ok := s.matches[matchId.ID]
 
-}
+		if !ok {
+			continue
+		}
 
-/**
-* Broadcasts current game state to all players of a particular match.
-**/
-func (s *MultiplayerServer) broadcastGameStateToPlayers(matchId uuid.UUID) {
-	// TODO: Refactor MultiplayerServer struct to include info
-	// for simpler way of accessing player connections.
-	gameState := s.matches[matchId]
+		fmt.Printf("match length currently: %d", len(match.Players))
 
-	// loop through all players of the game and find corresponding
-	// client's websocket connection to broadcast
-	// NOTE: If multiple goroutines try to write to the same connection at the same time,
-	// this can cause data races or undefined behavior.
-
-	for _, player := range gameState.Players {
-		for conn, client := range s.clientConns {
-			if player.ID == client.ID {
-				// get current channel responsible for reading-in messages before writing back to client
-				msgChan := s.getGameMsgChan(conn)
-				msgForClient := GameMessage{
-					Action:  init_match,
-					Payload: *gameState,
-				}
-				msgChan <- msgForClient
-			}
+		// match full, return id and start match
+		if len(match.Players) == 2 {
+			return match.ID
 		}
 	}
+
 }
 
 // --- Helpers ---
@@ -140,8 +126,10 @@ type PlayerIdString struct {
 	name string
 }
 
-// For pretty-fying matches for easier testing by mapping each id from a UUID
-// to a string
+/**
+* For pretty-fying matches for easier testing by mapping each id from a UUID
+* to a string.
+**/
 func MapIdStringMatches(matches map[uuid.UUID]*game.Game) map[string][]PlayerIdString {
 	matchesToPrint := make(map[string][]PlayerIdString)
 

@@ -243,11 +243,13 @@ export function clearGridStateHighlighting(gridState: GridState) {
 export function deduceGameAction<T>(gamePayload: GamePayload<T>) {
   const setFindingMatch = useWebsocketStore.getState().setFindingMatch;
   const setMatchInitiated = useWebsocketStore.getState().setMatchInitiated;
+  const setMatchErrored = useWebsocketStore.getState().setMatchErrored;
   const setGameState = useWebsocketStore.getState().setGameState;
 
   console.log("gamePayload action:", gamePayload.action);
 
   switch (gamePayload.action) {
+    // --- CASE: MATCH INITIATED --
     case GameAction.INIT_MATCH: {
       console.log("Initiating match...");
 
@@ -260,6 +262,16 @@ export function deduceGameAction<T>(gamePayload: GamePayload<T>) {
       // parse payload and set to store
       const serverGameState = gamePayload.payload as GameState;
       setGameState(serverGameState);
+    }
+    // --- CASE: MATCH ERROR OCCURED --
+    case GameAction.MATCH_ERROR: {
+      console.log("@WS Match errored.");
+      const gameError = gamePayload.payload as string;
+      setMatchErrored(gameError);
+
+      // end match making wait and match initiated
+      setFindingMatch(false);
+      setMatchInitiated(false);
     }
   }
 }

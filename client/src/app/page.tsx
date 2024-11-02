@@ -3,6 +3,7 @@ import { Button } from "@/components/Button";
 import { useWebsocketStore } from "@/stores/websocketStore";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { Play } from "next/font/google";
 
 export default function MainMenu() {
   const router = useRouter();
@@ -16,6 +17,8 @@ export default function MainMenu() {
     findingMatch,
     isConnected,
     matchInitiated,
+    matchErrored,
+    setMatchErrored,
   } = useWebsocketStore();
 
   // -- Handle Finding a Match --
@@ -40,6 +43,15 @@ export default function MainMenu() {
     }
   }, [matchInitiated]);
 
+  // reset back to menu in the case of error
+  useEffect(() => {
+    if (matchErrored) {
+      setTimeout(() => {
+        setMatchErrored("");
+      }, 3000);
+    }
+  }, [matchErrored]);
+
   function handleInitFindMatch() {
     if (!ws) {
       setupWebSocket();
@@ -52,9 +64,17 @@ export default function MainMenu() {
 
   return (
     <div className="flex flex-col justify-center items-center h-full">
-      {findingMatch ? (
+      {matchErrored ? (
+        // --- MATCH ERROR Screen ---
+        <div>
+          <div>Error: {matchErrored}</div>
+          <div>Returning back to matchmaking menu in a few seconds...</div>
+        </div>
+      ) : findingMatch ? (
+        // --- MATCHMAKING Screen ---
         <div>Searching for a Match...</div>
       ) : (
+        // ---- Default MATCH MENU Screen ---
         <Button variant="default" size="default" onClick={handleInitFindMatch}>
           Find Match
         </Button>

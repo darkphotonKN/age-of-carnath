@@ -44,6 +44,20 @@ type MultiplayerServer struct {
 	mu         sync.Mutex
 }
 
+type Math struct {
+	value int
+}
+
+func (m Math) Sum(x1, x2 int) int {
+	m.value = x1 + x2
+	return m.value
+}
+
+func (m Math) Subtract(x1, x2 int) int {
+	m.value = x1 - x2
+	return m.value
+}
+
 func NewMultiplayerServer(listenAddr string) *MultiplayerServer {
 	upgrader := websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
@@ -51,6 +65,9 @@ func NewMultiplayerServer(listenAddr string) *MultiplayerServer {
 			return true
 		},
 	}
+
+	mathHelper := Math{}
+	mathHelper.Sum(1, 2)
 
 	return &MultiplayerServer{
 		ListenAddr:       listenAddr,

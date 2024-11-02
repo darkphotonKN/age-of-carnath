@@ -18,10 +18,11 @@ import (
 type Action string
 
 const (
-	find_match Action = "find_match"
-	init_match Action = "init_match"
-	move       Action = "move"
-	attack     Action = "attack"
+	find_match  Action = "find_match"
+	init_match  Action = "init_match"
+	match_error Action = "match_error"
+	move        Action = "move"
+	attack      Action = "attack"
 )
 
 type GameMessage struct {
