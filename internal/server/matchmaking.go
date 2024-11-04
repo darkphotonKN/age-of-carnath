@@ -19,6 +19,8 @@ func (s *MultiplayerServer) findMatchAndBroadcast(player models.Player) {
 	go func() {
 		id := s.findMatch(player)
 
+		fmt.Println("Match found initially, id:", id)
+
 		matchFindChan <- id
 	}()
 
@@ -58,16 +60,17 @@ func (s *MultiplayerServer) findMatchAndBroadcast(player models.Player) {
 * TODO:
 * 1) Fix close error for client (1001 going away). DONE
 * 2) Only allow init match once the game is full, otherwise matchmaking should be pending.
-* 3) For v1.1: Add matchmaking algorithm.
+* 3) Add mutex locks.
+* 4) For v1.1: Add matchmaking algorithm.
 **/
 func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
+	fmt.Println("Starting matchmaking..")
 
 	// loop through current matches and find an opponent still waiting
 	// keep looping until queue is over 2 minutes long
 	// search all matches for empty match
 	for matchId, game := range s.matches {
 		// maps are not thread-safe, adding locking incase match was removed / altered
-		s.mu.Lock()
 		match := game.Players
 
 		// check length of match to know if its full
@@ -84,26 +87,27 @@ func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 			// end search immediately
 			return matchId
 		}
-
-		s.mu.Unlock()
 	}
 
-	// after first iteration means there were no open games, create one
-	matchId := game.InitializeGame(&player)
+	fmt.Println("No matches, starting new one..")
 
-	var timeWaited time.Duration
+	// after first iteration means there were no open games, create one
+	newMatch := game.InitializeGame(&player)
+
+	var timeWaited time.Duration = time.Second * 0
+	waitTime := time.Second * 1
 
 	for {
-		if timeWaited >= time.Second*10 {
+		if timeWaited >= time.Second*9 {
 			return uuid.Nil
 		}
 
 		// repeat check for game start every 3 seconds
-		waitTime := time.Second * 2
-		timeWaited = waitTime
+		timeWaited += waitTime
 		time.Sleep(waitTime)
 
-		match, ok := s.matches[matchId.ID]
+		match, ok := s.matches[newMatch.ID]
+		fmt.Printf("Time Waited: %d\nMatch Check: %+v\nMatch Found: %+v\n", timeWaited, s.matches[newMatch.ID], ok)
 
 		if !ok {
 			continue
