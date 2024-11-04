@@ -94,6 +94,10 @@ func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 	// after first iteration means there were no open games, create one
 	newMatch := game.InitializeGame(&player)
 
+	// add it to list of matches
+	s.matches[newMatch.ID] = newMatch
+
+	// count down for match to be filled
 	var timeWaited time.Duration = time.Second * 0
 	waitTime := time.Second * 1
 
@@ -107,11 +111,12 @@ func (s *MultiplayerServer) findMatch(player models.Player) uuid.UUID {
 		time.Sleep(waitTime)
 
 		match, ok := s.matches[newMatch.ID]
-		fmt.Printf("Time Waited: %d\nMatch Check: %+v\nMatch Found: %+v\n", timeWaited, s.matches[newMatch.ID], ok)
 
+		// no match was created, TODO: errored
 		if !ok {
 			continue
 		}
+		fmt.Printf("Time Waited: %d\nMatch Players: %+v\nMatch Found: %+v\n", timeWaited, match.Players, ok)
 
 		fmt.Printf("match length currently: %d", len(match.Players))
 

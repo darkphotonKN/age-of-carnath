@@ -19,7 +19,7 @@ const (
 **/
 type Game struct {
 	// Game unique identifier. NOTE: Currently matches the map key for server matches.
-	ID uuid.UUID
+	ID uuid.UUID `json:"id"`
 
 	// holds all the game's grid information
 	GridState GridState `json:"gridState"`
@@ -28,7 +28,7 @@ type Game struct {
 	Players []models.Player `json:"players"`
 
 	// Track whos turn it is
-	Turn models.Player
+	Turn models.Player `json:"turn"`
 }
 
 /**
